@@ -1,0 +1,1079 @@
+<!doctype html><!-- @wrap -->
+<html lang="fr"><!-- @wrap -->
+<head><!-- @wrap -->
+<meta charset="utf-8"><!-- @wrap -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><!-- @wrap -->
+<meta name="description" content="Swipe & Sache : le tinder de l'info. Choisis un thème, swipe des cartes, et chaque j'aime affine les suivantes."><!-- @wrap -->
+<title>Swipe & Sache</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap">
+<style>
+  :root {
+    --bg: #ECEEF3;
+    --glow: rgba(60, 80, 255, .13);
+    --surface: #FFFFFF;
+    --surface-2: #F5F6FA;
+    --ink: #13151C;
+    --muted: #666B7A;
+    --line: #DCDFE8;
+    --accent: #2323D8;
+    --accent-ink: #FFFFFF;
+    --like: #FF3E6C;
+    --skip: #4B5063;
+    --chip: #E7E9F0;
+    --band-s: 62%;
+    --band-l: 46%;
+    --band-ink: #FFFFFF;
+    --shadow: 0 30px 60px -28px rgba(19, 21, 28, .45), 0 4px 12px rgba(19, 21, 28, .08);
+    --shadow-soft: 0 10px 30px -14px rgba(19, 21, 28, .25);
+    --display: "Syne", "Avenir Next", "Segoe UI", sans-serif;
+    --body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0F1014;
+      --glow: rgba(110, 120, 255, .16);
+      --surface: #1A1B22;
+      --surface-2: #20222B;
+      --ink: #EEEFF5;
+      --muted: #9A9FB0;
+      --line: #2C2F3B;
+      --accent: #8A8CFF;
+      --accent-ink: #0F1030;
+      --like: #FF5C84;
+      --skip: #A9AEC0;
+      --chip: #272A35;
+      --band-s: 50%;
+      --band-l: 40%;
+      --band-ink: #FFFFFF;
+      --shadow: 0 30px 60px -28px rgba(0, 0, 0, .9), 0 4px 12px rgba(0, 0, 0, .35);
+      --shadow-soft: 0 10px 30px -14px rgba(0, 0, 0, .6);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0F1014;
+    --glow: rgba(110, 120, 255, .16);
+    --surface: #1A1B22;
+    --surface-2: #20222B;
+    --ink: #EEEFF5;
+    --muted: #9A9FB0;
+    --line: #2C2F3B;
+    --accent: #8A8CFF;
+    --accent-ink: #0F1030;
+    --like: #FF5C84;
+    --skip: #A9AEC0;
+    --chip: #272A35;
+    --band-s: 50%;
+    --band-l: 40%;
+    --band-ink: #FFFFFF;
+    --shadow: 0 30px 60px -28px rgba(0, 0, 0, .9), 0 4px 12px rgba(0, 0, 0, .35);
+    --shadow-soft: 0 10px 30px -14px rgba(0, 0, 0, .6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: radial-gradient(1100px 520px at 50% -8%, var(--glow), transparent 65%), var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  [hidden] { display: none !important; }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  .app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-inline: 16px;
+    padding-block: 12px 10px;
+    gap: 10px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  /* ---------- header ---------- */
+  .top { display: flex; flex-direction: column; gap: 10px; }
+  .brandRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .mark {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: var(--accent);
+    display: grid; place-items: center;
+    box-shadow: var(--shadow-soft);
+  }
+  .mark svg { width: 20px; height: 20px; }
+  .brand h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: -.03em;
+    line-height: 1;
+  }
+  .brand small { display: block; color: var(--muted); font-size: .74rem; margin-top: 3px; letter-spacing: .02em; }
+  .iconBtns { display: flex; gap: 6px; }
+  .iconBtn {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: .82rem;
+    font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .iconBtn svg { width: 15px; height: 15px; }
+  .panelBtn { display: none; }
+
+  .topic {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 5px 5px 14px;
+    box-shadow: var(--shadow-soft);
+  }
+  .topic svg.spark { width: 18px; height: 18px; color: var(--accent); flex: none; }
+  .topic input {
+    flex: 1; min-width: 0;
+    border: 0; background: transparent;
+    padding: 8px 4px;
+    font-size: 1rem;
+  }
+  .topic input:focus { outline: none; }
+  .topic input::placeholder { color: var(--muted); }
+  .topic button {
+    border: 0;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .topic button:disabled { opacity: .5; cursor: default; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    border: 1px solid transparent;
+    background: var(--chip);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: .8rem;
+    font-weight: 500;
+    transition: border-color .15s, transform .12s;
+  }
+  .chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+  /* ---------- stage ---------- */
+  .stage {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 900px) {
+    .stage { grid-template-columns: minmax(0, 1fr) 330px; }
+  }
+  .deckWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    min-height: 0;
+  }
+  .status {
+    min-height: 26px;
+    font-size: .82rem;
+    color: var(--muted);
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 3px 12px;
+    border-radius: 999px;
+  }
+  .status.busy, .status.err { background: var(--surface); border: 1px solid var(--line); }
+  .status.err { color: var(--like); }
+  .status button {
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: .78rem;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
+
+  .deck {
+    position: relative;
+    width: min(100%, 400px);
+    flex: 1;
+    min-height: 320px;
+    max-height: 600px;
+    touch-action: pan-y;
+  }
+  .card {
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    transform: translateY(calc(var(--i) * 12px)) scale(calc(1 - var(--i) * .045)) rotate(calc(var(--r) * 1deg));
+    transition: transform .3s cubic-bezier(.2, .8, .2, 1), opacity .3s ease;
+    will-change: transform;
+  }
+  .card.enter { animation: pop .35s cubic-bezier(.2, .8, .2, 1); }
+  @keyframes pop { from { transform: translateY(14px) scale(.94); opacity: .6; } }
+  .card.dragging { transition: none; cursor: grabbing; }
+  .card.top { cursor: grab; }
+  .cardTop {
+    flex: 0 0 auto;
+    min-height: 42%;
+    padding: 20px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    color: var(--band-ink);
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(255, 255, 255, .22), transparent 55%),
+      linear-gradient(135deg, hsl(var(--h) var(--band-s) var(--band-l)), hsl(calc(var(--h) + 34) var(--band-s) calc(var(--band-l) - 10%)));
+  }
+  .eyebrow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 700;
+    opacity: .92;
+  }
+  .eyebrow .ex {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, .5);
+    border-radius: 999px;
+    padding: 1px 8px;
+  }
+  .card h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(1.6rem, 3vw + .8rem, 2.35rem);
+    line-height: 1.02;
+    letter-spacing: -.03em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  .cardBottom {
+    padding: 18px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+  .card p { margin: 0; font-size: 1.04rem; line-height: 1.5; }
+  .card .extra {
+    color: var(--muted);
+    font-style: italic;
+    font-size: .93rem;
+    padding-left: 12px;
+    border-left: 3px solid hsl(var(--h) var(--band-s) var(--band-l));
+  }
+  .tags { margin-top: auto; display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px; }
+  .tag {
+    font-size: .73rem;
+    font-weight: 500;
+    background: var(--chip);
+    border-radius: 999px;
+    padding: 3px 10px;
+    color: var(--muted);
+  }
+  .stamp {
+    position: absolute;
+    top: 22px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: .06em;
+    padding: 4px 14px;
+    border: 3px solid;
+    border-radius: 10px;
+    opacity: 0;
+    pointer-events: none;
+    background: var(--surface);
+  }
+  .stamp.like { right: 20px; color: var(--like); border-color: var(--like); transform: rotate(12deg); }
+  .stamp.skip { left: 20px; color: var(--skip); border-color: var(--skip); transform: rotate(-12deg); }
+
+  .empty {
+    position: absolute;
+    inset: 0;
+    border: 2px dashed var(--line);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 28px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty strong { color: var(--ink); font-family: var(--display); font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; }
+  .empty p { margin: 0; max-width: 30ch; }
+  .empty .cta {
+    border: 0;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-weight: 600;
+  }
+
+  .actions { display: flex; align-items: center; gap: 22px; }
+  .act {
+    border: 0;
+    background: var(--surface);
+    border-radius: 50%;
+    width: 66px; height: 66px;
+    display: grid; place-items: center;
+    box-shadow: var(--shadow-soft);
+    transition: transform .12s ease, background .15s ease, color .15s ease;
+  }
+  .act:active { transform: scale(.9); }
+  .act:disabled { opacity: .4; cursor: default; transform: none; }
+  .act svg { width: 28px; height: 28px; }
+  .act.skip { color: var(--skip); }
+  .act.like { color: var(--like); }
+  .act.skip:hover:not(:disabled) { background: var(--skip); color: #fff; }
+  .act.like:hover:not(:disabled) { background: var(--like); color: #fff; }
+  .act.undo { width: 46px; height: 46px; color: var(--muted); }
+  .act.undo svg { width: 20px; height: 20px; }
+  .act.undo:hover:not(:disabled) { color: var(--accent); }
+  .hint { margin: 0; font-size: .76rem; color: var(--muted); text-align: center; max-width: 46ch; }
+  kbd {
+    font: inherit; font-size: .7rem;
+    border: 1px solid var(--line); border-bottom-width: 2px;
+    border-radius: 5px; padding: 0 5px; background: var(--surface);
+  }
+
+  /* ---------- panel ---------- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: auto;
+    min-height: 0;
+    box-shadow: var(--shadow-soft);
+  }
+  .panel h3 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: .95rem;
+    font-weight: 800;
+    letter-spacing: -.01em;
+  }
+  .panel .sub { font-size: .8rem; color: var(--muted); margin: 3px 0 0; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+  .stat b { display: block; font-family: var(--display); font-weight: 800; font-size: 1.4rem; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .stat span { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+  .stat.like b { color: var(--like); }
+  .wlist { display: flex; flex-direction: column; gap: 7px; }
+  .wrow { display: grid; grid-template-columns: minmax(0, 1fr) 90px 30px; gap: 8px; align-items: center; font-size: .85rem; }
+  .wrow .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .wrow .bar { height: 7px; background: var(--chip); border-radius: 4px; overflow: hidden; }
+  .wrow .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s ease; }
+  .wrow.neg .bar i { background: var(--skip); opacity: .6; }
+  .wrow .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); font-size: .78rem; }
+  .likedList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+  .likedList li {
+    background: var(--surface-2);
+    border-left: 4px solid hsl(var(--h) var(--band-s) var(--band-l));
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: .85rem;
+  }
+  .likedList li b { display: block; font-family: var(--display); font-weight: 700; }
+  .likedList li span { color: var(--muted); }
+  .resetBtn {
+    align-self: flex-start;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: .8rem;
+  }
+  .resetBtn:hover { color: var(--like); border-color: var(--like); }
+  .none { font-size: .85rem; color: var(--muted); font-style: italic; margin: 0; }
+
+  @media (max-width: 899px) {
+    .panelBtn { display: inline-flex; }
+    .panel {
+      display: none;
+      position: fixed;
+      left: 12px; right: 12px;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+      top: max(70px, 12vh);
+      z-index: 20;
+      box-shadow: var(--shadow);
+    }
+    .panel.open { display: flex; }
+    .closeBtn { display: inline-block; }
+  }
+  .closeBtn {
+    display: none;
+    align-self: flex-end;
+    border: 0;
+    background: var(--chip);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: .8rem;
+  }
+
+  /* ---------- modal ---------- */
+  .modal {
+    position: fixed; inset: 0; z-index: 30;
+    background: rgba(10, 12, 20, .45);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .modalCard {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 22px;
+    width: min(100%, 460px);
+    display: flex; flex-direction: column; gap: 14px;
+    box-shadow: var(--shadow);
+  }
+  .modalCard h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.2rem; letter-spacing: -.02em; }
+  .modalCard label { display: flex; flex-direction: column; gap: 5px; font-size: .84rem; font-weight: 600; }
+  .modalCard input, .modalCard select {
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: .95rem;
+    font-weight: 400;
+    width: 100%;
+  }
+  .modalCard .note { margin: 0; font-size: .8rem; color: var(--muted); }
+  .modalCard .note a { color: var(--accent); }
+  .modalRow { display: flex; gap: 8px; justify-content: flex-end; }
+  .btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 8px 16px; font-weight: 600; }
+  .btn.primary { border-color: transparent; background: var(--accent); color: var(--accent-ink); }
+  .modalErr { color: var(--like); font-size: .82rem; margin: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .act, .chip, .wrow .bar i { transition: none !important; animation: none !important; }
+    .dot { animation: none; }
+  }
+</style>
+</head><body><!-- @wrap -->
+
+<div class="app">
+  <header class="top">
+    <div class="brandRow">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><rect x="7" y="3" width="12" height="16" rx="2" transform="rotate(8 13 11)"/><rect x="4" y="5" width="12" height="16" rx="2" fill="#fff" stroke="none" opacity=".95"/></svg>
+        </div>
+        <div>
+          <h1>Swipe &amp; Sache</h1>
+          <small>le tinder de l'info</small>
+        </div>
+      </div>
+      <div class="iconBtns">
+        <button class="iconBtn" id="settingsBtn" type="button" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          <span id="settingsLabel">Clé API</span>
+        </button>
+        <button class="iconBtn panelBtn" id="panelBtn" type="button">Mon profil</button>
+      </div>
+    </div>
+    <form class="topic" id="topicForm">
+      <svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.7L19.5 9.5l-5.7 1.8L12 17l-1.8-5.7L4.5 9.5l5.7-1.8zM5 16l.9 2.6L8.5 19.5l-2.6.9L5 23l-.9-2.6-2.6-.9 2.6-.9zM19 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>
+      <label class="sr" for="topicInput">Thème à explorer</label>
+      <input id="topicInput" type="text" autocomplete="off" placeholder="Un thème : mots en espagnol, actus sport, astronomie…">
+      <button type="submit" id="goBtn">Lancer</button>
+    </form>
+    <div class="chips" id="suggest"></div>
+  </header>
+
+  <main class="stage">
+    <section class="deckWrap">
+      <div class="status" id="status"></div>
+      <div class="deck" id="deck"></div>
+      <div class="actions">
+        <button class="act skip" id="skipBtn" type="button" aria-label="Passer" title="Passer (←)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <button class="act undo" id="undoBtn" type="button" aria-label="Annuler le dernier swipe" title="Annuler (⌫)" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>
+        </button>
+        <button class="act like" id="likeBtn" type="button" aria-label="J'aime" title="J'aime (→)">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.2 3.2 4.5 6.8 4.5c2 0 3.4 1.1 4.2 2.4.8-1.3 2.2-2.4 4.2-2.4 3.6 0 5.8 3.7 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>
+        </button>
+      </div>
+      <p class="hint">Glisse à droite si ça t'intéresse, à gauche sinon. <kbd>←</kbd> <kbd>→</kbd> au clavier. Chaque « j'aime » renforce ce genre d'info dans la suite.</p>
+    </section>
+
+    <aside class="panel" id="panel">
+      <button class="closeBtn" id="closeBtn" type="button">Fermer</button>
+      <div>
+        <h3 id="panelTopic">Thème</h3>
+        <p class="sub" id="panelSub"></p>
+      </div>
+      <div class="stats">
+        <div class="stat like"><b id="nLike">0</b><span>aimées</span></div>
+        <div class="stat"><b id="nSkip">0</b><span>passées</span></div>
+        <div class="stat"><b id="nDeck">0</b><span>à venir</span></div>
+      </div>
+      <div>
+        <h3>Ce qui te plaît</h3>
+        <p class="sub">Poids par sous-thème. Un « j'aime » ajoute 2, un « passe » retire 1.</p>
+      </div>
+      <div class="wlist" id="wlist"></div>
+      <h3>Cartes gardées</h3>
+      <ul class="likedList" id="likedList"></ul>
+      <button class="resetBtn" id="resetBtn" type="button">Tout effacer et repartir de zéro</button>
+    </aside>
+  </main>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <form class="modalCard" id="settingsForm">
+    <h3>Connexion à l'IA</h3>
+    <p class="note">Cette page appelle directement l'API Anthropic depuis ton navigateur. La clé reste dans ce navigateur et ne part que vers api.anthropic.com. Crée une clé sur <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.</p>
+    <label>Clé API Anthropic
+      <input id="keyInput" type="password" autocomplete="off" placeholder="sk-ant-…">
+    </label>
+    <label>Modèle
+      <select id="modelSelect">
+        <option value="claude-opus-5">Opus 5 · le plus soigné</option>
+        <option value="claude-sonnet-5">Sonnet 5 · équilibré</option>
+        <option value="claude-haiku-4-5">Haiku 4.5 · le plus rapide</option>
+      </select>
+    </label>
+    <p class="modalErr" id="modalErr" hidden></p>
+    <div class="modalRow">
+      <button class="btn" type="button" id="modalCancel">Annuler</button>
+      <button class="btn primary" type="submit">Enregistrer</button>
+    </div>
+  </form>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const deckEl = $('deck'), statusEl = $('status');
+  const SAMPLE_TOPIC = 'Apprends-moi des mots en espagnol';
+  const SUGGESTIONS = [
+    'Apprends-moi des mots en espagnol',
+    'Les nouvelles du sport',
+    'Histoire de France en anecdotes',
+    'Science du quotidien',
+    'Vocabulaire japonais pour voyager',
+    'Cinéma et séries',
+    'Astronomie',
+    'Économie expliquée simplement',
+  ];
+  const KINDS = { mot: 'Mot', fait: 'Le savais-tu ?', actu: 'Actu', conseil: 'Astuce', citation: 'Citation', info: 'Info' };
+  const SAMPLE_CARDS = [
+    { title: 'la mariposa', body: 'Le papillon.', extra: 'Una mariposa azul se posó en mi mano.', tags: ['animaux', 'nom', 'nature'], kind: 'mot', sample: true },
+    { title: 'madrugar', body: 'Se lever très tôt, avant l’aube. Un seul verbe là où le français a besoin d’une phrase.', extra: 'Mañana tengo que madrugar.', tags: ['verbe', 'quotidien'], kind: 'mot', sample: true },
+    { title: 'la sobremesa', body: 'Le moment où l’on reste à table à discuter après le repas. Sans équivalent en français.', extra: 'La sobremesa duró más que la comida.', tags: ['culture', 'repas', 'nom'], kind: 'mot', sample: true },
+    { title: 'ojalá', body: '« Pourvu que », « si seulement ». Le mot vient de l’arabe « in sha’ Allah », si Dieu le veut.', extra: '¡Ojalá llueva mañana!', tags: ['expression', 'étymologie'], kind: 'mot', sample: true },
+    { title: 'estar embarazada', body: 'Être enceinte. Faux ami classique : ça ne veut pas dire « être embarrassé ».', extra: 'Pour « gêné », on dit avergonzado.', tags: ['faux-ami', 'quotidien'], kind: 'mot', sample: true },
+    { title: 'el murciélago', body: 'La chauve-souris. Le mot contient les cinq voyelles de l’espagnol, une seule fois chacune.', extra: 'Los murciélagos salen al anochecer.', tags: ['animaux', 'nom', 'curiosité'], kind: 'mot', sample: true },
+    { title: 'tener ganas de', body: 'Avoir envie de. Se construit avec un infinitif ou un nom.', extra: 'Tengo ganas de viajar a Sevilla.', tags: ['expression', 'verbe'], kind: 'mot', sample: true },
+    { title: 'la vergüenza ajena', body: 'La honte que l’on ressent pour quelqu’un d’autre. Le tréma sur le u indique qu’il se prononce.', extra: 'Sentí vergüenza ajena por él.', tags: ['expression', 'culture', 'émotion'], kind: 'mot', sample: true },
+  ];
+
+  const freshState = (topic, deck) => ({ topic, deck: deck || [], seen: [], liked: [], skipped: [], weights: {}, vocab: [] });
+  let state = freshState(SAMPLE_TOPIC, SAMPLE_CARDS.map(c => ({ ...c })));
+  let backend = null;      // { kind: 'sample' | 'api', generate(system, user, {onDelta, signal}) }
+  let loading = false, ctl = null, lastAction = null, interacted = false, aiDead = false;
+  let dragging = false, pendingRender = false, flying = false;
+  let settings = { key: '', model: 'claude-opus-5' };
+
+  // ---------- persistence (per-viewer convenience) ----------
+  const KEY = 'swipe-sache-v2', SKEY = 'swipe-sache-settings';
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    try { window.claude?.hot?.snapshot?.(state); } catch (e) {}
+  }
+  function load(hot) {
+    try {
+      const s = hot && hot.topic ? hot : JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (s && s.topic && Array.isArray(s.deck)) state = { ...freshState(s.topic), ...s };
+    } catch (e) {}
+    try { const s = JSON.parse(localStorage.getItem(SKEY) || 'null'); if (s) settings = { ...settings, ...s }; } catch (e) {}
+  }
+  function saveSettings() { try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch (e) {} }
+
+  // ---------- helpers ----------
+  const hue = (s) => { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
+  const norm = (t) => String(t).toLowerCase().trim().replace(/\s+/g, ' ').slice(0, 24);
+  function setStatus(msg, kind, retry) {
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+    statusEl.textContent = '';
+    if (kind === 'busy') { const d = document.createElement('span'); d.className = 'dot'; statusEl.append(d); }
+    if (msg) statusEl.append(msg);
+    if (kind === 'busy') {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Stop';
+      b.onclick = () => ctl?.abort(); statusEl.append(b);
+    }
+    if (retry) {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Réessayer';
+      b.onclick = () => fetchMore(6); statusEl.append(b);
+    }
+  }
+
+  // ---------- prompt ----------
+  const SYSTEM = `Tu alimentes une application de type « Tinder de l'info » : l'utilisateur swipe des cartes courtes et ses « j'aime » servent à renforcer ce genre d'info dans les cartes suivantes.
+
+Règles :
+1. Environ 70 % des cartes prolongent ce que l'utilisateur aime (mêmes sous-thèmes, même angle, même niveau que les cartes aimées). Les 30 % restantes explorent des sous-thèmes voisins du thème pour découvrir de nouveaux goûts. Évite les sous-thèmes évités.
+2. S'il n'y a encore aucun goût connu, varie au maximum les sous-thèmes.
+3. Chaque carte est autonome, précise et vérifiable. "body" fait au plus 220 caractères. Pas de remplissage, pas d'introduction.
+4. Langue : le français. Si le thème est l'apprentissage d'une langue, "title" est le mot ou l'expression dans la langue cible, "body" sa traduction et une nuance utile, "extra" un exemple de phrase dans la langue cible.
+5. Si le thème touche à l'actualité : tu n'as pas accès à internet. Donne des faits datés que tu connais avec certitude et indique la période dans "extra" (ex. « Saison 2024-2025 »). Ne fabrique jamais de résultat ni de chiffre.
+6. "kind" vaut l'une de ces valeurs : "mot", "fait", "actu", "conseil", "citation", "info".
+7. "tags" : 2 ou 3 mots-clés courts en minuscules décrivant le sous-thème de la carte (ex. "verbe", "faux-ami", "football", "espace").
+8. Ne répète jamais un titre déjà vu, ni une paraphrase.
+
+Format de sortie, strict : une carte par ligne, chaque ligne est un objet JSON complet et compact, sans tableau englobant, sans texte avant ou après, sans code fence. Écris la première ligne immédiatement.
+Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una mariposa se posó en la flor.","tags":["animaux","nom"],"kind":"mot"}`;
+
+  function buildUser(n) {
+    const w = Object.entries(state.weights);
+    const liked = w.filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const avoided = w.filter(([, v]) => v < 0).sort((a, b) => a[1] - b[1]).slice(0, 5);
+    const fmt = (arr) => arr.length ? arr.map(([k, v]) => `${k} (${v > 0 ? '+' : ''}${v})`).join(', ') : 'aucun pour l’instant';
+    const titles = (arr, k) => arr.slice(-k).map(c => `« ${c.title} »`).join(', ') || 'aucune';
+    const seen = state.seen.concat(state.deck.map(c => c.title)).slice(-70).map(t => `« ${t} »`).join(', ') || 'aucun';
+    const vocab = state.vocab.slice(-30).join(', ') || 'aucun';
+    return `Thème demandé : « ${state.topic} »
+
+Profil de l'utilisateur pour ce thème :
+- Sous-thèmes aimés (poids) : ${fmt(liked)}
+- Sous-thèmes évités (poids) : ${fmt(avoided)}
+- Dernières cartes aimées : ${titles(state.liked, 12)}
+- Dernières cartes passées : ${titles(state.skipped, 8)}
+- Tags déjà utilisés (réutilise-les quand ils conviennent) : ${vocab}
+- Titres déjà vus, à ne jamais répéter : ${seen}
+
+Génère ${n} nouvelles cartes, une par ligne.`;
+  }
+
+  // ---------- backends ----------
+  async function detectBackend() {
+    let s = null;
+    try { s = await window.claude?.use?.('sample'); } catch (e) { s = null; }
+    if (s) {
+      return {
+        kind: 'sample',
+        async generate(system, user, { onDelta, signal }) {
+          let prev = 0;
+          await s(system + '\n\n' + user, {
+            modelTier: 'quick', cache: false, signal,
+            onText: ({ text }) => { onDelta(text.slice(prev)); prev = text.length; },
+          });
+        },
+      };
+    }
+    if (window.claude) return null; // inside a Claude viewer but sampling unavailable
+    return {
+      kind: 'api',
+      async generate(system, user, { onDelta, signal }) {
+        if (!settings.key) throw { code: 'no_key' };
+        const model = settings.model || 'claude-opus-5';
+        const body = { model, max_tokens: 8000, stream: true, system, messages: [{ role: 'user', content: user }] };
+        const headers = {
+          'content-type': 'application/json',
+          'x-api-key': settings.key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        };
+        if (model === 'claude-opus-5' || model === 'claude-sonnet-5') body.output_config = { effort: 'low' };
+        if (model === 'claude-opus-5') { body.fallbacks = 'default'; headers['anthropic-beta'] = 'server-side-fallback-2026-07-01'; }
+        let res;
+        try {
+          res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body), signal });
+        } catch (e) {
+          if (e && e.name === 'AbortError') throw { code: 'cancelled' };
+          throw { code: 'upstream_error', message: String(e) };
+        }
+        if (!res.ok) {
+          const t = await res.text().catch(() => '');
+          const code = res.status === 401 ? 'bad_key' : res.status === 429 ? 'rate_limited' : res.status === 400 ? 'bad_request' : 'upstream_error';
+          throw { code, message: t.slice(0, 300) };
+        }
+        const reader = res.body.getReader(), dec = new TextDecoder();
+        let buf = '';
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          let i;
+          while ((i = buf.indexOf('\n')) >= 0) {
+            const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+            if (!line.startsWith('data:')) continue;
+            let ev; try { ev = JSON.parse(line.slice(5)); } catch (e) { continue; }
+            if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') onDelta(ev.delta.text);
+            else if (ev.type === 'message_delta' && ev.delta && ev.delta.stop_reason === 'refusal') throw { code: 'refused' };
+            else if (ev.type === 'error') throw { code: 'upstream_error', message: JSON.stringify(ev.error || ev) };
+          }
+        }
+      },
+    };
+  }
+
+  // ---------- card parsing (one JSON object per line, as it streams) ----------
+  function makeLineSink(onCard) {
+    let buf = '';
+    const eat = (line) => {
+      const s = line.trim().replace(/^[\s,\[\]`]+|[\s,\[\]`]+$/g, '');
+      if (!s.startsWith('{')) return;
+      try { onCard(JSON.parse(s)); } catch (e) {}
+    };
+    return {
+      push(delta) { buf += delta; let i; while ((i = buf.indexOf('\n')) >= 0) { eat(buf.slice(0, i)); buf = buf.slice(i + 1); } },
+      flush() { if (buf.trim()) eat(buf); buf = ''; },
+    };
+  }
+  function acceptCard(c) {
+    if (!c || typeof c.title !== 'string' || typeof c.body !== 'string') return null;
+    const title = c.title.trim(); if (!title) return null;
+    const known = new Set(state.seen.map(norm).concat(state.deck.map(x => norm(x.title))));
+    if (known.has(norm(title))) return null;
+    const tags = (Array.isArray(c.tags) ? c.tags : []).map(norm).filter(Boolean).slice(0, 3);
+    for (const t of tags) if (!state.vocab.includes(t)) state.vocab.push(t);
+    return { title, body: c.body.trim().slice(0, 400), extra: typeof c.extra === 'string' ? c.extra.trim().slice(0, 240) : '', tags, kind: KINDS[c.kind] ? c.kind : 'info' };
+  }
+
+  const ERR = {
+    rate_limited: 'Trop de demandes pour le moment. Réessaie dans une minute.',
+    session_expired: 'Ta session a expiré. Reconnecte-toi puis réessaie.',
+    refused: 'Claude a refusé cette demande. Essaie de formuler le thème autrement.',
+    empty_completion: 'Aucune carte reçue. Essaie un thème plus précis.',
+    invalid_json: 'La réponse n’était pas lisible. Réessaie.',
+    upstream_error: 'Petit souci de connexion. Réessaie.',
+    prompt_too_large: 'Historique trop long. Efface le profil et repars.',
+    bad_key: 'Clé API refusée. Vérifie-la dans les réglages.',
+    bad_request: 'Requête refusée par l’API. Change de modèle dans les réglages.',
+    no_key: 'Ajoute ta clé API Anthropic pour générer des cartes.',
+  };
+  const HIDE = new Set(['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed']);
+
+  async function fetchMore(n) {
+    if (!backend || loading || aiDead) return;
+    if (backend.kind === 'api' && !settings.key) { renderDeck(); return; }
+    loading = true;
+    ctl = new AbortController();
+    setStatus('Claude écrit les prochaines cartes…', 'busy');
+    let got = 0;
+    const sink = makeLineSink((raw) => {
+      const card = acceptCard(raw); if (!card) return;
+      const wasVisible = state.deck.length;
+      state.deck.push(card); got++;
+      if (wasVisible < 3) renderDeck(true); else $('nDeck').textContent = state.deck.length;
+    });
+    try {
+      await backend.generate(SYSTEM, buildUser(n), { onDelta: (d) => sink.push(d), signal: ctl.signal });
+      sink.flush();
+      if (!got) throw { code: 'empty_completion' };
+      save();
+      setStatus('');
+    } catch (e) {
+      sink.flush();
+      const code = e && e.code ? e.code : 'upstream_error';
+      if (code === 'cancelled') setStatus('');
+      else if (HIDE.has(code)) { aiDead = true; setStatus('L’IA n’est pas autorisée dans cette vue. Tu peux quand même swiper les cartes déjà là.', 'err'); }
+      else if (code === 'bad_key' || code === 'no_key') { setStatus(ERR[code], 'err'); openSettings(ERR[code]); }
+      else setStatus(ERR[code] || ERR.upstream_error, 'err', got === 0);
+      if (got) save();
+    } finally {
+      loading = false; ctl = null;
+      renderDeck(); renderPanel();
+    }
+  }
+
+  function maybePrefetch() {
+    if (!interacted || !backend || loading || aiDead) return;
+    if (state.deck.length <= 4) fetchMore(state.deck.length === 0 ? 6 : 6);
+  }
+
+  // ---------- deck rendering ----------
+  function makeCard(c, i) {
+    const el = document.createElement('article');
+    el.className = 'card' + (i === 0 ? ' top' : '');
+    el.style.setProperty('--i', i);
+    el.style.setProperty('--r', i === 0 ? 0 : (i % 2 ? -2.2 : 2.2));
+    el.style.setProperty('--h', hue(c.tags[0] || c.title));
+    const top = document.createElement('div'); top.className = 'cardTop';
+    const eyebrow = document.createElement('div'); eyebrow.className = 'eyebrow';
+    eyebrow.append(KINDS[c.kind] || 'Info');
+    if (c.sample) { const ex = document.createElement('span'); ex.className = 'ex'; ex.textContent = 'exemple'; eyebrow.append(ex); }
+    const h2 = document.createElement('h2'); h2.textContent = c.title;
+    top.append(eyebrow, h2);
+    const bottom = document.createElement('div'); bottom.className = 'cardBottom';
+    const p = document.createElement('p'); p.textContent = c.body; bottom.append(p);
+    if (c.extra) { const x = document.createElement('p'); x.className = 'extra'; x.textContent = c.extra; bottom.append(x); }
+    const tags = document.createElement('div'); tags.className = 'tags';
+    for (const t of c.tags) { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tags.append(s); }
+    bottom.append(tags);
+    const sl = document.createElement('div'); sl.className = 'stamp like'; sl.textContent = 'J’AIME';
+    const ss = document.createElement('div'); ss.className = 'stamp skip'; ss.textContent = 'PASSE';
+    el.append(top, bottom, sl, ss);
+    return el;
+  }
+
+  function renderDeck(animate) {
+    if (dragging || flying) { pendingRender = true; return; }
+    pendingRender = false;
+    deckEl.textContent = '';
+    const top = state.deck.slice(0, 3);
+    for (let i = top.length - 1; i >= 0; i--) {
+      const el = makeCard(top[i], i);
+      if (i === 0) { attachDrag(el); if (animate) el.classList.add('enter'); }
+      deckEl.append(el);
+    }
+    if (!top.length) {
+      const e = document.createElement('div'); e.className = 'empty';
+      const s = document.createElement('strong');
+      const p = document.createElement('p');
+      if (loading) { s.textContent = 'Claude réfléchit…'; p.textContent = 'La première carte arrive dans quelques secondes.'; }
+      else if (backend && backend.kind === 'api' && !settings.key) {
+        s.textContent = 'Connecte l’IA'; p.textContent = 'Ajoute ta clé API Anthropic pour que Claude génère les cartes de ton thème.';
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'cta'; b.textContent = 'Ajouter ma clé'; b.onclick = () => openSettings(); e.append(s, p, b); deckEl.append(e);
+        $('nDeck').textContent = 0; $('undoBtn').disabled = !lastAction; $('skipBtn').disabled = $('likeBtn').disabled = true; return;
+      }
+      else if (!backend || aiDead) { s.textContent = 'Plus de cartes'; p.textContent = 'L’IA n’est pas disponible dans cette vue pour en générer d’autres.'; }
+      else { s.textContent = 'Plus de cartes'; p.textContent = 'Lance un thème ci-dessus, ou réessaie.'; }
+      e.append(s, p); deckEl.append(e);
+    }
+    $('nDeck').textContent = state.deck.length;
+    $('undoBtn').disabled = !lastAction;
+    $('skipBtn').disabled = $('likeBtn').disabled = !top.length;
+  }
+
+  // ---------- swipe ----------
+  function attachDrag(el) {
+    let sx = 0, sy = 0, dx = 0, dy = 0, active = false;
+    const stampL = el.querySelector('.stamp.like'), stampS = el.querySelector('.stamp.skip');
+    el.addEventListener('pointerdown', (ev) => {
+      if (flying) return;
+      if (ev.button !== 0 && ev.pointerType === 'mouse') return;
+      active = true; dragging = true; sx = ev.clientX; sy = ev.clientY; dx = dy = 0;
+      el.classList.add('dragging'); el.classList.remove('enter'); el.setPointerCapture(ev.pointerId);
+    });
+    el.addEventListener('pointermove', (ev) => {
+      if (!active) return;
+      dx = ev.clientX - sx; dy = ev.clientY - sy;
+      el.style.transform = `translate(${dx}px, ${dy * .4}px) rotate(${dx / 18}deg)`;
+      stampL.style.opacity = Math.min(1, Math.max(0, dx / 90));
+      stampS.style.opacity = Math.min(1, Math.max(0, -dx / 90));
+    });
+    const end = () => {
+      if (!active) return; active = false; dragging = false;
+      el.classList.remove('dragging');
+      if (Math.abs(dx) > 100) fly(el, dx > 0 ? 'like' : 'skip');
+      else { el.style.transform = ''; stampL.style.opacity = 0; stampS.style.opacity = 0; if (pendingRender) renderDeck(); }
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  }
+
+  function fly(el, dir) {
+    if (flying || !state.deck.length) return;
+    flying = true;
+    const sign = dir === 'like' ? 1 : -1;
+    el.querySelector('.stamp.' + dir).style.opacity = 1;
+    el.style.transition = 'transform .32s ease-in, opacity .32s ease-in';
+    el.style.transform = `translate(${sign * (window.innerWidth + 200)}px, -40px) rotate(${sign * 25}deg)`;
+    el.style.opacity = '0';
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(() => { flying = false; commit(dir); }, reduced ? 0 : 280);
+  }
+
+  function commit(dir) {
+    interacted = true;
+    const card = state.deck.shift(); if (!card) { renderDeck(); return; }
+    state.seen.push(card.title);
+    const delta = dir === 'like' ? 2 : -1;
+    for (const t of card.tags) state.weights[t] = (state.weights[t] || 0) + delta;
+    (dir === 'like' ? state.liked : state.skipped).push(card);
+    lastAction = { card, dir };
+    save(); renderDeck(true); renderPanel(); maybePrefetch();
+  }
+
+  function undo() {
+    if (!lastAction || flying) return;
+    const { card, dir } = lastAction; lastAction = null;
+    const delta = dir === 'like' ? 2 : -1;
+    for (const t of card.tags) { state.weights[t] = (state.weights[t] || 0) - delta; if (state.weights[t] === 0) delete state.weights[t]; }
+    const list = dir === 'like' ? state.liked : state.skipped;
+    const i = list.lastIndexOf(card); if (i >= 0) list.splice(i, 1);
+    const j = state.seen.lastIndexOf(card.title); if (j >= 0) state.seen.splice(j, 1);
+    state.deck.unshift(card);
+    save(); renderDeck(true); renderPanel();
+  }
+
+  function swipeTop(dir) {
+    const top = deckEl.querySelector('.card.top');
+    if (top) fly(top, dir);
+  }
+
+  // ---------- panel ----------
+  function renderPanel() {
+    $('panelTopic').textContent = state.topic;
+    const isSample = state.deck.every(c => c.sample) && !state.liked.length && !state.skipped.length;
+    $('panelSub').textContent = isSample ? 'Jeu d’exemple. Lance un thème pour que Claude génère la suite.' : 'Les cartes suivantes sont générées par Claude à partir de tes swipes.';
+    $('nLike').textContent = state.liked.length;
+    $('nSkip').textContent = state.skipped.length;
+    $('nDeck').textContent = state.deck.length;
+    const wl = $('wlist'); wl.textContent = '';
+    const entries = Object.entries(state.weights).sort((a, b) => b[1] - a[1]);
+    if (!entries.length) { const n = document.createElement('p'); n.className = 'none'; n.textContent = 'Swipe quelques cartes pour dessiner ton profil.'; wl.append(n); }
+    const max = Math.max(1, ...entries.map(([, v]) => Math.abs(v)));
+    for (const [k, v] of entries.slice(0, 14)) {
+      const row = document.createElement('div'); row.className = 'wrow' + (v < 0 ? ' neg' : '');
+      const name = document.createElement('span'); name.className = 'name'; name.textContent = k;
+      const bar = document.createElement('span'); bar.className = 'bar';
+      const fill = document.createElement('i'); fill.style.width = (Math.abs(v) / max * 100) + '%'; bar.append(fill);
+      const n = document.createElement('span'); n.className = 'n'; n.textContent = (v > 0 ? '+' : '') + v;
+      row.append(name, bar, n); wl.append(row);
+    }
+    const ll = $('likedList'); ll.textContent = '';
+    if (!state.liked.length) { const n = document.createElement('p'); n.className = 'none'; n.textContent = 'Aucune carte gardée pour l’instant.'; ll.append(n); }
+    for (const c of state.liked.slice().reverse().slice(0, 40)) {
+      const li = document.createElement('li'); li.style.setProperty('--h', hue(c.tags[0] || c.title));
+      const b = document.createElement('b'); b.textContent = c.title;
+      const s = document.createElement('span'); s.textContent = c.body;
+      li.append(b, s); ll.append(li);
+    }
+  }
+
+  // ---------- settings modal ----------
+  function openSettings(msg) {
+    $('keyInput').value = settings.key || '';
+    $('modelSelect').value = settings.model || 'claude-opus-5';
+    const err = $('modalErr'); err.hidden = !msg; err.textContent = msg || '';
+    $('modal').hidden = false;
+    setTimeout(() => $('keyInput').focus(), 0);
+  }
+  function closeSettings() { $('modal').hidden = true; }
+  $('settingsForm').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    settings.key = $('keyInput').value.trim();
+    settings.model = $('modelSelect').value;
+    saveSettings(); closeSettings(); setStatus('');
+    renderDeck();
+    if (settings.key && state.topic !== SAMPLE_TOPIC && state.deck.length <= 4) { interacted = true; fetchMore(6); }
+  });
+  $('modalCancel').onclick = closeSettings;
+  $('modal').addEventListener('click', (ev) => { if (ev.target === $('modal')) closeSettings(); });
+  $('settingsBtn').onclick = () => openSettings();
+
+  // ---------- topic ----------
+  function startTopic(topic) {
+    topic = topic.trim(); if (!topic) return;
+    ctl?.abort();
+    interacted = true; lastAction = null;
+    state = freshState(topic);
+    $('topicInput').value = topic;
+    $('panel').classList.remove('open');
+    save(); renderDeck(); renderPanel();
+    if (!backend || aiDead) { setStatus('L’IA n’est pas disponible dans cette vue.', 'err'); return; }
+    if (backend.kind === 'api' && !settings.key) { openSettings(); return; }
+    fetchMore(6);
+  }
+
+  $('topicForm').addEventListener('submit', (ev) => { ev.preventDefault(); startTopic($('topicInput').value); });
+  const sug = $('suggest');
+  for (const s of SUGGESTIONS) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = s;
+    b.onclick = () => startTopic(s); sug.append(b);
+  }
+  $('likeBtn').onclick = () => swipeTop('like');
+  $('skipBtn').onclick = () => swipeTop('skip');
+  $('undoBtn').onclick = undo;
+  $('resetBtn').onclick = () => {
+    ctl?.abort(); lastAction = null; interacted = false;
+    state = freshState(SAMPLE_TOPIC, SAMPLE_CARDS.map(c => ({ ...c })));
+    $('topicInput').value = '';
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    save(); renderDeck(true); renderPanel(); setStatus('');
+    $('panel').classList.remove('open');
+  };
+  $('panelBtn').onclick = () => $('panel').classList.toggle('open');
+  $('closeBtn').onclick = () => $('panel').classList.remove('open');
+  document.addEventListener('keydown', (ev) => {
+    if (!$('modal').hidden) { if (ev.key === 'Escape') closeSettings(); return; }
+    if (ev.target && (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'SELECT')) return;
+    if (ev.key === 'ArrowRight') { ev.preventDefault(); swipeTop('like'); }
+    else if (ev.key === 'ArrowLeft') { ev.preventDefault(); swipeTop('skip'); }
+    else if (ev.key === 'Backspace') { ev.preventDefault(); undo(); }
+  });
+
+  // ---------- boot ----------
+  function start(hot) {
+    load(hot);
+    if (state.topic !== SAMPLE_TOPIC || state.liked.length || state.skipped.length) $('topicInput').value = state.topic;
+    renderDeck(); renderPanel();
+    (async () => {
+      backend = await detectBackend();
+      if (!backend) {
+        setStatus('L’IA n’est pas disponible dans cette vue : tu peux swiper le jeu d’exemple.', 'err');
+        $('goBtn').disabled = true;
+      } else if (backend.kind === 'api') {
+        $('settingsBtn').hidden = false;
+        $('settingsLabel').textContent = settings.key ? 'Réglages IA' : 'Clé API';
+      }
+      renderDeck();
+    })();
+  }
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? null);
+})();
+</script>
+</body></html><!-- @wrap -->
