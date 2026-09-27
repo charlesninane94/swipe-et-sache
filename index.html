@@ -8,21 +8,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap">
 <style>
   :root {
-    --bg: #ECEEF3;
-    --glow: rgba(60, 80, 255, .13);
-    --surface: #FFFFFF;
-    --surface-2: #F5F6FA;
-    --ink: #13151C;
-    --muted: #666B7A;
-    --line: #DCDFE8;
-    --accent: #2323D8;
-    --accent-ink: #FFFFFF;
-    --like: #FF3E6C;
-    --skip: #4B5063;
+    --bg: #ECEEF3; --glow: rgba(60, 80, 255, .13);
+    --surface: #FFFFFF; --surface-2: #F5F6FA;
+    --ink: #13151C; --muted: #666B7A; --line: #DCDFE8;
+    --accent: #2323D8; --accent-ink: #FFFFFF; --accent-soft: rgba(35, 35, 216, .1);
+    --like: #FF3E6C; --skip: #4B5063; --ok: #12A35E; --warn: #E08A00;
     --chip: #E7E9F0;
-    --band-s: 62%;
-    --band-l: 46%;
-    --band-ink: #FFFFFF;
+    --band-s: 62%; --band-l: 46%; --band-ink: #FFFFFF;
     --shadow: 0 30px 60px -28px rgba(19, 21, 28, .45), 0 4px 12px rgba(19, 21, 28, .08);
     --shadow-soft: 0 10px 30px -14px rgba(19, 21, 28, .25);
     --display: "Syne", "Avenir Next", "Segoe UI", sans-serif;
@@ -33,42 +25,26 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --bg: #0F1014;
-      --glow: rgba(110, 120, 255, .16);
-      --surface: #1A1B22;
-      --surface-2: #20222B;
-      --ink: #EEEFF5;
-      --muted: #9A9FB0;
-      --line: #2C2F3B;
-      --accent: #8A8CFF;
-      --accent-ink: #0F1030;
-      --like: #FF5C84;
-      --skip: #A9AEC0;
+      --bg: #0F1014; --glow: rgba(110, 120, 255, .16);
+      --surface: #1A1B22; --surface-2: #20222B;
+      --ink: #EEEFF5; --muted: #9A9FB0; --line: #2C2F3B;
+      --accent: #8A8CFF; --accent-ink: #0F1030; --accent-soft: rgba(138, 140, 255, .14);
+      --like: #FF5C84; --skip: #A9AEC0; --ok: #3ACB80; --warn: #F2A93B;
       --chip: #272A35;
-      --band-s: 50%;
-      --band-l: 40%;
-      --band-ink: #FFFFFF;
+      --band-s: 50%; --band-l: 40%;
       --shadow: 0 30px 60px -28px rgba(0, 0, 0, .9), 0 4px 12px rgba(0, 0, 0, .35);
       --shadow-soft: 0 10px 30px -14px rgba(0, 0, 0, .6);
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #0F1014;
-    --glow: rgba(110, 120, 255, .16);
-    --surface: #1A1B22;
-    --surface-2: #20222B;
-    --ink: #EEEFF5;
-    --muted: #9A9FB0;
-    --line: #2C2F3B;
-    --accent: #8A8CFF;
-    --accent-ink: #0F1030;
-    --like: #FF5C84;
-    --skip: #A9AEC0;
+    --bg: #0F1014; --glow: rgba(110, 120, 255, .16);
+    --surface: #1A1B22; --surface-2: #20222B;
+    --ink: #EEEFF5; --muted: #9A9FB0; --line: #2C2F3B;
+    --accent: #8A8CFF; --accent-ink: #0F1030; --accent-soft: rgba(138, 140, 255, .14);
+    --like: #FF5C84; --skip: #A9AEC0; --ok: #3ACB80; --warn: #F2A93B;
     --chip: #272A35;
-    --band-s: 50%;
-    --band-l: 40%;
-    --band-ink: #FFFFFF;
+    --band-s: 50%; --band-l: 40%;
     --shadow: 0 30px 60px -28px rgba(0, 0, 0, .9), 0 4px 12px rgba(0, 0, 0, .35);
     --shadow-soft: 0 10px 30px -14px rgba(0, 0, 0, .6);
   }
@@ -85,162 +61,106 @@
     -webkit-font-smoothing: antialiased;
   }
   [hidden] { display: none !important; }
-  button, input, select { font: inherit; color: inherit; }
+  button, input, select, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  h2 { font-family: var(--display); font-weight: 800; letter-spacing: -.02em; margin: 0; }
+  h3 { font-family: var(--display); font-weight: 800; letter-spacing: -.01em; font-size: .95rem; margin: 0; }
+  .sub { font-size: .8rem; color: var(--muted); margin: 3px 0 0; }
+  .none { font-size: .85rem; color: var(--muted); font-style: italic; margin: 0; }
 
   .app {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding-inline: 16px;
-    padding-block: 12px 10px;
-    gap: 10px;
-    max-width: 1120px;
-    margin: 0 auto;
+    min-height: 100%;
+    display: flex; flex-direction: column;
+    padding-inline: 16px; padding-block: 12px 14px;
+    gap: 12px;
+    max-width: 1120px; margin: 0 auto;
   }
+  .app.oneScreen { height: 100%; }
 
   /* ---------- header ---------- */
   .top { display: flex; flex-direction: column; gap: 10px; }
-  .brandRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brandRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .brand { display: flex; align-items: center; gap: 10px; }
-  .mark {
-    width: 34px; height: 34px; border-radius: 10px;
-    background: var(--accent);
-    display: grid; place-items: center;
-    box-shadow: var(--shadow-soft);
-  }
+  .mark { width: 34px; height: 34px; border-radius: 10px; background: var(--accent); display: grid; place-items: center; box-shadow: var(--shadow-soft); }
   .mark svg { width: 20px; height: 20px; }
-  .brand h1 {
-    margin: 0;
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 1.3rem;
-    letter-spacing: -.03em;
-    line-height: 1;
+  .brand h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.3rem; letter-spacing: -.03em; line-height: 1; }
+  .brand small { display: block; color: var(--muted); font-size: .74rem; margin-top: 3px; }
+  .right { display: flex; align-items: center; gap: 8px; }
+  .streak {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 4px 12px 4px 6px; font-size: .82rem; font-weight: 600;
   }
-  .brand small { display: block; color: var(--muted); font-size: .74rem; margin-top: 3px; letter-spacing: .02em; }
-  .iconBtns { display: flex; gap: 6px; }
+  .ring { width: 28px; height: 28px; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 3.5; }
+  .ring .track { stroke: var(--chip); }
+  .ring .prog { stroke: var(--accent); stroke-linecap: round; transition: stroke-dasharray .4s ease; }
+  .streak .flame { color: var(--warn); display: inline-flex; align-items: center; gap: 3px; }
+  .streak .flame svg { width: 14px; height: 14px; }
   .iconBtn {
-    border: 1px solid var(--line);
-    background: var(--surface);
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-size: .82rem;
-    font-weight: 600;
-    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+    padding: 6px 12px; font-size: .82rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
   }
   .iconBtn svg { width: 15px; height: 15px; }
-  .panelBtn { display: none; }
+  .tabs {
+    display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px; overflow-x: auto; align-self: flex-start; max-width: 100%;
+  }
+  .tab {
+    border: 0; background: transparent; border-radius: 999px; padding: 7px 14px;
+    font-weight: 600; font-size: .86rem; color: var(--muted); white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tab.on { background: var(--accent); color: var(--accent-ink); }
+  .tab .badge { background: var(--like); color: #fff; border-radius: 999px; font-size: .68rem; padding: 0 6px; line-height: 1.5; }
+  .tab.on .badge { background: var(--accent-ink); color: var(--accent); }
 
   .topic {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 5px 5px 5px 14px;
-    box-shadow: var(--shadow-soft);
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 5px 5px 14px; box-shadow: var(--shadow-soft);
   }
   .topic svg.spark { width: 18px; height: 18px; color: var(--accent); flex: none; }
-  .topic input {
-    flex: 1; min-width: 0;
-    border: 0; background: transparent;
-    padding: 8px 4px;
-    font-size: 1rem;
-  }
+  .topic input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 4px; font-size: 1rem; }
   .topic input:focus { outline: none; }
   .topic input::placeholder { color: var(--muted); }
-  .topic button {
-    border: 0;
-    background: var(--accent);
-    color: var(--accent-ink);
-    border-radius: 999px;
-    padding: 9px 18px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
+  .topic button { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 9px 18px; font-weight: 600; white-space: nowrap; }
   .topic button:disabled { opacity: .5; cursor: default; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip {
-    border: 1px solid transparent;
-    background: var(--chip);
-    color: var(--ink);
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-size: .8rem;
-    font-weight: 500;
+    border: 1px solid transparent; background: var(--chip); color: var(--ink);
+    border-radius: 999px; padding: 5px 12px; font-size: .8rem; font-weight: 500;
     transition: border-color .15s, transform .12s;
   }
   .chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .chip.ai { background: var(--accent-soft); }
 
-  /* ---------- stage ---------- */
-  .stage {
-    flex: 1;
-    min-height: 0;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  @media (min-width: 900px) {
-    .stage { grid-template-columns: minmax(0, 1fr) 330px; }
-  }
-  .deckWrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    min-height: 0;
-  }
+  /* ---------- views ---------- */
+  .view { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; }
+  .stage { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 900px) { .stage { grid-template-columns: minmax(0, 1fr) 330px; } }
+
+  /* ---------- swiper ---------- */
+  .deckWrap { display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 0; }
   .status {
-    min-height: 26px;
-    font-size: .82rem;
-    color: var(--muted);
-    display: inline-flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 3px 12px;
-    border-radius: 999px;
+    min-height: 26px; font-size: .82rem; color: var(--muted);
+    display: inline-flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;
+    padding: 3px 12px; border-radius: 999px;
   }
   .status.busy, .status.err { background: var(--surface); border: 1px solid var(--line); }
   .status.err { color: var(--like); }
-  .status button {
-    border: 1px solid var(--line);
-    background: var(--surface-2);
-    border-radius: 999px;
-    padding: 2px 10px;
-    font-size: .78rem;
-  }
-  .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 1s ease-in-out infinite;
-  }
+  .status button { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 2px 10px; font-size: .78rem; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
 
-  .deck {
-    position: relative;
-    width: min(100%, 400px);
-    flex: 1;
-    min-height: 320px;
-    max-height: 600px;
-    touch-action: pan-y;
-  }
+  .deck { position: relative; width: min(100%, 410px); flex: 1; min-height: 340px; max-height: 620px; touch-action: pan-y; }
   .card {
-    position: absolute;
-    inset: 0;
-    background: var(--surface);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
+    position: absolute; inset: 0;
+    background: var(--surface); border-radius: 24px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; overflow: hidden;
+    user-select: none; -webkit-user-select: none;
     transform: translateY(calc(var(--i) * 12px)) scale(calc(1 - var(--i) * .045)) rotate(calc(var(--r) * 1deg));
     transition: transform .3s cubic-bezier(.2, .8, .2, 1), opacity .3s ease;
     will-change: transform;
@@ -250,123 +170,63 @@
   .card.dragging { transition: none; cursor: grabbing; }
   .card.top { cursor: grab; }
   .cardTop {
-    flex: 0 0 auto;
-    min-height: 42%;
-    padding: 20px 22px 22px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 14px;
+    flex: 0 0 auto; min-height: 40%;
+    padding: 18px 22px 22px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
     color: var(--band-ink);
     background:
       radial-gradient(120% 90% at 100% 0%, rgba(255, 255, 255, .22), transparent 55%),
       linear-gradient(135deg, hsl(var(--h) var(--band-s) var(--band-l)), hsl(calc(var(--h) + 34) var(--band-s) calc(var(--band-l) - 10%)));
   }
   .eyebrow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    font-size: .7rem;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    font-weight: 700;
-    opacity: .92;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; opacity: .92;
   }
-  .eyebrow .ex {
-    text-transform: none;
-    letter-spacing: 0;
-    font-weight: 500;
-    border: 1px solid rgba(255, 255, 255, .5);
-    border-radius: 999px;
-    padding: 1px 8px;
-  }
+  .eyebrow .ex { text-transform: none; letter-spacing: 0; font-weight: 500; border: 1px solid rgba(255, 255, 255, .5); border-radius: 999px; padding: 1px 8px; }
+  .titleRow { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
   .card h2 {
-    margin: 0;
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: clamp(1.6rem, 3vw + .8rem, 2.35rem);
-    line-height: 1.02;
-    letter-spacing: -.03em;
-    text-wrap: balance;
-    overflow-wrap: anywhere;
+    font-size: clamp(1.6rem, 3vw + .8rem, 2.35rem); line-height: 1.02; letter-spacing: -.03em;
+    text-wrap: balance; overflow-wrap: anywhere;
   }
-  .cardBottom {
-    padding: 18px 22px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
+  .speak {
+    flex: none; border: 1px solid rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .16);
+    color: inherit; border-radius: 50%; width: 38px; height: 38px; display: grid; place-items: center;
   }
+  .speak svg { width: 18px; height: 18px; }
+  .cardBottom { padding: 16px 22px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; overflow: auto; }
   .card p { margin: 0; font-size: 1.04rem; line-height: 1.5; }
-  .card .extra {
-    color: var(--muted);
-    font-style: italic;
-    font-size: .93rem;
-    padding-left: 12px;
-    border-left: 3px solid hsl(var(--h) var(--band-s) var(--band-l));
+  .card .extra { color: var(--muted); font-style: italic; font-size: .93rem; padding-left: 12px; border-left: 3px solid hsl(var(--h) var(--band-s) var(--band-l)); }
+  .deep { font-size: .92rem; color: var(--ink); background: var(--surface-2); border-radius: 12px; padding: 10px 12px; line-height: 1.5; }
+  .deepBtn {
+    align-self: flex-start; border: 1px solid var(--line); background: transparent; color: var(--accent);
+    border-radius: 999px; padding: 4px 12px; font-size: .8rem; font-weight: 600; display: inline-flex; gap: 6px; align-items: center;
   }
-  .tags { margin-top: auto; display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px; }
-  .tag {
-    font-size: .73rem;
-    font-weight: 500;
-    background: var(--chip);
-    border-radius: 999px;
-    padding: 3px 10px;
-    color: var(--muted);
-  }
+  .deepBtn svg { width: 14px; height: 14px; }
+  .cardFoot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 4px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: .73rem; font-weight: 500; background: var(--chip); border-radius: 999px; padding: 3px 10px; color: var(--muted); }
   .stamp {
-    position: absolute;
-    top: 22px;
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 1.5rem;
-    letter-spacing: .06em;
-    padding: 4px 14px;
-    border: 3px solid;
-    border-radius: 10px;
-    opacity: 0;
-    pointer-events: none;
-    background: var(--surface);
+    position: absolute; top: 22px; font-family: var(--display); font-weight: 800; font-size: 1.5rem; letter-spacing: .06em;
+    padding: 4px 14px; border: 3px solid; border-radius: 10px; opacity: 0; pointer-events: none; background: var(--surface);
   }
   .stamp.like { right: 20px; color: var(--like); border-color: var(--like); transform: rotate(12deg); }
   .stamp.skip { left: 20px; color: var(--skip); border-color: var(--skip); transform: rotate(-12deg); }
 
   .empty {
-    position: absolute;
-    inset: 0;
-    border: 2px dashed var(--line);
-    border-radius: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 28px;
-    text-align: center;
-    color: var(--muted);
+    position: absolute; inset: 0; border: 2px dashed var(--line); border-radius: 24px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    padding: 28px; text-align: center; color: var(--muted);
   }
   .empty strong { color: var(--ink); font-family: var(--display); font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; }
   .empty p { margin: 0; max-width: 30ch; }
-  .empty .cta {
-    border: 0;
-    background: var(--accent);
-    color: var(--accent-ink);
-    border-radius: 999px;
-    padding: 9px 18px;
-    font-weight: 600;
-  }
+  .cta { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 9px 18px; font-weight: 600; }
+  .ghost { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: .86rem; }
+  .ghost.danger:hover { color: var(--like); border-color: var(--like); }
 
   .actions { display: flex; align-items: center; gap: 22px; }
   .act {
-    border: 0;
-    background: var(--surface);
-    border-radius: 50%;
-    width: 66px; height: 66px;
-    display: grid; place-items: center;
-    box-shadow: var(--shadow-soft);
+    border: 0; background: var(--surface); border-radius: 50%; width: 66px; height: 66px;
+    display: grid; place-items: center; box-shadow: var(--shadow-soft);
     transition: transform .12s ease, background .15s ease, color .15s ease;
   }
   .act:active { transform: scale(.9); }
@@ -378,44 +238,20 @@
   .act.like:hover:not(:disabled) { background: var(--like); color: #fff; }
   .act.undo { width: 46px; height: 46px; color: var(--muted); }
   .act.undo svg { width: 20px; height: 20px; }
-  .act.undo:hover:not(:disabled) { color: var(--accent); }
   .hint { margin: 0; font-size: .76rem; color: var(--muted); text-align: center; max-width: 46ch; }
-  kbd {
-    font: inherit; font-size: .7rem;
-    border: 1px solid var(--line); border-bottom-width: 2px;
-    border-radius: 5px; padding: 0 5px; background: var(--surface);
-  }
+  kbd { font: inherit; font-size: .7rem; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; background: var(--surface); }
 
-  /* ---------- panel ---------- */
+  /* ---------- side panel ---------- */
   .panel {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    overflow: auto;
-    min-height: 0;
-    box-shadow: var(--shadow-soft);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 18px;
+    display: flex; flex-direction: column; gap: 16px; overflow: auto; min-height: 0; box-shadow: var(--shadow-soft);
   }
-  .panel h3 {
-    margin: 0;
-    font-family: var(--display);
-    font-size: .95rem;
-    font-weight: 800;
-    letter-spacing: -.01em;
-  }
-  .panel .sub { font-size: .8rem; color: var(--muted); margin: 3px 0 0; }
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .stat {
-    background: var(--surface-2);
-    border-radius: 12px;
-    padding: 10px 12px;
-  }
+  .stat { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; }
   .stat b { display: block; font-family: var(--display); font-weight: 800; font-size: 1.4rem; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
   .stat span { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
   .stat.like b { color: var(--like); }
+  .stat.ok b { color: var(--ok); }
   .wlist { display: flex; flex-direction: column; gap: 7px; }
   .wrow { display: grid; grid-template-columns: minmax(0, 1fr) 90px 30px; gap: 8px; align-items: center; font-size: .85rem; }
   .wrow .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
@@ -424,92 +260,113 @@
   .wrow.neg .bar i { background: var(--skip); opacity: .6; }
   .wrow .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); font-size: .78rem; }
   .likedList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
-  .likedList li {
-    background: var(--surface-2);
-    border-left: 4px solid hsl(var(--h) var(--band-s) var(--band-l));
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: .85rem;
-  }
+  .likedList li { background: var(--surface-2); border-left: 4px solid hsl(var(--h) var(--band-s) var(--band-l)); border-radius: 10px; padding: 8px 12px; font-size: .85rem; }
   .likedList li b { display: block; font-family: var(--display); font-weight: 700; }
   .likedList li span { color: var(--muted); }
-  .resetBtn {
-    align-self: flex-start;
-    border: 1px solid var(--line);
-    background: transparent;
-    color: var(--muted);
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-size: .8rem;
-  }
-  .resetBtn:hover { color: var(--like); border-color: var(--like); }
-  .none { font-size: .85rem; color: var(--muted); font-style: italic; margin: 0; }
-
+  .panelBtn { display: none; }
+  .closeBtn { display: none; align-self: flex-end; border: 0; background: var(--chip); border-radius: 999px; padding: 5px 12px; font-size: .8rem; }
   @media (max-width: 899px) {
     .panelBtn { display: inline-flex; }
-    .panel {
-      display: none;
-      position: fixed;
-      left: 12px; right: 12px;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
-      top: max(70px, 12vh);
-      z-index: 20;
-      box-shadow: var(--shadow);
-    }
+    .panel { display: none; position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); top: max(70px, 12vh); z-index: 20; box-shadow: var(--shadow); }
     .panel.open { display: flex; }
     .closeBtn { display: inline-block; }
   }
-  .closeBtn {
-    display: none;
-    align-self: flex-end;
-    border: 0;
-    background: var(--chip);
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-size: .8rem;
+
+  /* ---------- themes view ---------- */
+  .viewHead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .viewHead h2 { font-size: 1.5rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .tcard {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+    display: flex; flex-direction: column; box-shadow: var(--shadow-soft);
   }
+  .tcard.active { border-color: var(--accent); }
+  .tband { height: 8px; background: linear-gradient(90deg, hsl(var(--h) var(--band-s) var(--band-l)), hsl(calc(var(--h) + 40) var(--band-s) calc(var(--band-l) - 8%))); }
+  .tbody { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .tbody h3 { font-size: 1.05rem; text-wrap: balance; }
+  .tmeta { font-size: .78rem; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+  .tmeta b { color: var(--ink); font-weight: 600; }
+  .ttags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .trow { margin-top: auto; display: flex; gap: 8px; align-items: center; }
+  .trow .cta { padding: 7px 14px; font-size: .85rem; }
+  .trow .ghost { padding: 6px 12px; font-size: .8rem; }
+  .suggestBox { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .sugList { display: flex; flex-direction: column; gap: 6px; }
+  .sug { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface-2); border-radius: 12px; padding: 8px 12px; font-size: .88rem; }
+  .sug b { font-family: var(--display); font-weight: 700; display: block; }
+  .sug span { color: var(--muted); font-size: .8rem; }
+  .sug button { flex: none; }
+
+  /* ---------- profile view ---------- */
+  .pgrid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 760px) { .pgrid { grid-template-columns: 1fr 1fr; } }
+  .box { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow-soft); }
+  .box.wide { grid-column: 1 / -1; }
+  .hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .hero .stat b { font-size: 1.8rem; }
+  .seg { display: inline-flex; gap: 4px; background: var(--chip); border-radius: 999px; padding: 3px; align-self: flex-start; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; font-size: .82rem; font-weight: 600; color: var(--muted); }
+  .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-soft); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .row input[type=number] { width: 80px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 6px 10px; }
+  .syncPill { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--muted); }
+  .syncPill i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; }
+  .syncPill.local i { background: var(--warn); }
+  textarea.io { width: 100%; min-height: 110px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 10px; font-size: .8rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: .7rem; color: var(--muted); }
+  .day i { width: 100%; aspect-ratio: 1; border-radius: 8px; background: var(--chip); display: block; position: relative; overflow: hidden; }
+  .day i b { position: absolute; left: 0; right: 0; bottom: 0; background: var(--accent); display: block; }
+  .day.today span { color: var(--ink); font-weight: 700; }
+
+  /* ---------- review view ---------- */
+  .reviewWrap { display: flex; flex-direction: column; align-items: center; gap: 14px; flex: 1; }
+  .flip {
+    width: min(100%, 410px); min-height: 340px;
+    background: var(--surface); border-radius: 24px; box-shadow: var(--shadow); overflow: hidden;
+    display: flex; flex-direction: column; cursor: pointer;
+  }
+  .flip .cardTop { min-height: 45%; }
+  .flip .cardBottom { justify-content: center; }
+  .flip .where { font-size: .78rem; color: var(--muted); }
+  .flip .reveal { color: var(--muted); font-style: italic; text-align: center; }
+  .reviewActions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .rbtn { border: 2px solid; background: var(--surface); border-radius: 999px; padding: 10px 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+  .rbtn.ko { color: var(--like); border-color: var(--like); }
+  .rbtn.ok { color: var(--ok); border-color: var(--ok); }
+  .rbtn.ko:hover { background: var(--like); color: #fff; }
+  .rbtn.ok:hover { background: var(--ok); color: #fff; }
+  .boxes { display: flex; gap: 4px; }
+  .boxes i { width: 10px; height: 10px; border-radius: 3px; background: var(--chip); }
+  .boxes i.on { background: var(--ok); }
 
   /* ---------- modal ---------- */
-  .modal {
-    position: fixed; inset: 0; z-index: 30;
-    background: rgba(10, 12, 20, .45);
-    display: flex; align-items: center; justify-content: center;
-    padding: 16px;
-  }
-  .modalCard {
-    background: var(--surface);
-    border-radius: 20px;
-    padding: 22px;
-    width: min(100%, 460px);
-    display: flex; flex-direction: column; gap: 14px;
-    box-shadow: var(--shadow);
-  }
-  .modalCard h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.2rem; letter-spacing: -.02em; }
+  .modal { position: fixed; inset: 0; z-index: 30; background: rgba(10, 12, 20, .45); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .modalCard { background: var(--surface); border-radius: 20px; padding: 22px; width: min(100%, 460px); display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow); max-height: 90vh; overflow: auto; }
+  .modalCard h3 { font-size: 1.2rem; }
   .modalCard label { display: flex; flex-direction: column; gap: 5px; font-size: .84rem; font-weight: 600; }
-  .modalCard input, .modalCard select {
-    border: 1px solid var(--line);
-    background: var(--surface-2);
-    border-radius: 10px;
-    padding: 9px 12px;
-    font-size: .95rem;
-    font-weight: 400;
-    width: 100%;
-  }
+  .modalCard input, .modalCard select { border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 9px 12px; font-size: .95rem; font-weight: 400; width: 100%; }
   .modalCard .note { margin: 0; font-size: .8rem; color: var(--muted); }
   .modalCard .note a { color: var(--accent); }
-  .modalRow { display: flex; gap: 8px; justify-content: flex-end; }
+  .modalRow { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
   .btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 8px 16px; font-weight: 600; }
   .btn.primary { border-color: transparent; background: var(--accent); color: var(--accent-ink); }
   .modalErr { color: var(--like); font-size: .82rem; margin: 0; }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%);
+    background: var(--ink); color: var(--bg); border-radius: 999px; padding: 8px 16px; font-size: .85rem; font-weight: 600;
+    z-index: 40; box-shadow: var(--shadow); opacity: 0; transition: opacity .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
 
   @media (prefers-reduced-motion: reduce) {
-    .card, .act, .chip, .wrow .bar i { transition: none !important; animation: none !important; }
+    .card, .act, .chip, .wrow .bar i, .ring .prog { transition: none !important; animation: none !important; }
     .dot { animation: none; }
   }
 </style>
 </head><body><!-- @wrap -->
 
-<div class="app">
+<div class="app oneScreen" id="app">
   <header class="top">
     <div class="brandRow">
       <div class="brand">
@@ -521,14 +378,28 @@
           <small>le tinder de l'info</small>
         </div>
       </div>
-      <div class="iconBtns">
+      <div class="right">
+        <div class="streak" id="streakPill" title="Objectif du jour et série de jours">
+          <svg class="ring" viewBox="0 0 32 32" aria-hidden="true"><circle class="track" cx="16" cy="16" r="13"/><circle class="prog" id="ringProg" cx="16" cy="16" r="13" stroke-dasharray="0 81.7"/></svg>
+          <span id="goalTxt">0/20</span>
+          <span class="flame"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4 5 5.5 5 10.5A5.5 5.5 0 0 1 12 18a5.5 5.5 0 0 1-5-5.5c0-1.6.5-2.8 1.3-3.9.3 1.2 1 2 2.2 2.3C10 8 10 5 12 2z"/></svg><span id="streakTxt">0</span></span>
+        </div>
         <button class="iconBtn" id="settingsBtn" type="button" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
           <span id="settingsLabel">Clé API</span>
         </button>
-        <button class="iconBtn panelBtn" id="panelBtn" type="button">Mon profil</button>
       </div>
     </div>
+    <nav class="tabs" id="tabs" aria-label="Sections">
+      <button class="tab on" data-view="swipe" type="button">Swiper</button>
+      <button class="tab" data-view="themes" type="button">Thèmes <span class="badge" id="nThemesBadge" hidden></span></button>
+      <button class="tab" data-view="review" type="button">Réviser <span class="badge" id="dueBadge" hidden></span></button>
+      <button class="tab" data-view="profile" type="button">Profil</button>
+    </nav>
+  </header>
+
+  <!-- ================= SWIPE ================= -->
+  <section class="view" id="viewSwipe">
     <form class="topic" id="topicForm">
       <svg class="spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.7L19.5 9.5l-5.7 1.8L12 17l-1.8-5.7L4.5 9.5l5.7-1.8zM5 16l.9 2.6L8.5 19.5l-2.6.9L5 23l-.9-2.6-2.6-.9 2.6-.9zM19 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>
       <label class="sr" for="topicInput">Thème à explorer</label>
@@ -536,56 +407,116 @@
       <button type="submit" id="goBtn">Lancer</button>
     </form>
     <div class="chips" id="suggest"></div>
-  </header>
+    <div class="stage">
+      <div class="deckWrap">
+        <div class="status" id="status"></div>
+        <div class="deck" id="deck"></div>
+        <div class="actions">
+          <button class="act skip" id="skipBtn" type="button" aria-label="Passer" title="Passer (←)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+          <button class="act undo" id="undoBtn" type="button" aria-label="Annuler le dernier swipe" title="Annuler (⌫)" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>
+          </button>
+          <button class="act like" id="likeBtn" type="button" aria-label="J'aime" title="J'aime (→)">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.2 3.2 4.5 6.8 4.5c2 0 3.4 1.1 4.2 2.4.8-1.3 2.2-2.4 4.2-2.4 3.6 0 5.8 3.7 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>
+          </button>
+        </div>
+        <p class="hint">Glisse à droite si ça t'intéresse, à gauche sinon. <kbd>←</kbd> <kbd>→</kbd> au clavier. Chaque « j'aime » nourrit ton profil et la suite des cartes.</p>
+        <button class="iconBtn panelBtn" id="panelBtn" type="button">Ce thème en détail</button>
+      </div>
+      <aside class="panel" id="panel">
+        <button class="closeBtn" id="closeBtn" type="button">Fermer</button>
+        <div><h3 id="panelTopic">Thème</h3><p class="sub" id="panelSub"></p></div>
+        <div class="stats">
+          <div class="stat like"><b id="nLike">0</b><span>aimées</span></div>
+          <div class="stat"><b id="nSkip">0</b><span>passées</span></div>
+          <div class="stat"><b id="nDeck">0</b><span>à venir</span></div>
+        </div>
+        <div><h3>Ce qui te plaît ici</h3><p class="sub">Poids par sous-thème dans ce thème. Un « j'aime » ajoute 2, un « passe » retire 1.</p></div>
+        <div class="wlist" id="wlist"></div>
+        <h3>Cartes gardées</h3>
+        <ul class="likedList" id="likedList"></ul>
+      </aside>
+    </div>
+  </section>
 
-  <main class="stage">
-    <section class="deckWrap">
-      <div class="status" id="status"></div>
-      <div class="deck" id="deck"></div>
-      <div class="actions">
-        <button class="act skip" id="skipBtn" type="button" aria-label="Passer" title="Passer (←)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-        </button>
-        <button class="act undo" id="undoBtn" type="button" aria-label="Annuler le dernier swipe" title="Annuler (⌫)" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>
-        </button>
-        <button class="act like" id="likeBtn" type="button" aria-label="J'aime" title="J'aime (→)">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.2 3.2 4.5 6.8 4.5c2 0 3.4 1.1 4.2 2.4.8-1.3 2.2-2.4 4.2-2.4 3.6 0 5.8 3.7 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>
-        </button>
+  <!-- ================= THEMES ================= -->
+  <section class="view" id="viewThemes" hidden>
+    <div class="viewHead">
+      <div><h2>Tes thèmes</h2><p class="sub">Chaque thème garde sa pile, ses cartes aimées et ses réglages. Reprends où tu t'étais arrêté.</p></div>
+      <button class="cta" id="newThemeBtn" type="button">Nouveau thème</button>
+    </div>
+    <div class="suggestBox">
+      <div class="row" style="justify-content: space-between">
+        <div><h3>Idées pour toi</h3><p class="sub">Claude propose des thèmes à partir de ce que tu aimes déjà.</p></div>
+        <button class="ghost" id="surpriseBtn" type="button">Surprends-moi</button>
       </div>
-      <p class="hint">Glisse à droite si ça t'intéresse, à gauche sinon. <kbd>←</kbd> <kbd>→</kbd> au clavier. Chaque « j'aime » renforce ce genre d'info dans la suite.</p>
-    </section>
+      <div class="sugList" id="sugList"></div>
+    </div>
+    <div class="grid" id="themeGrid"></div>
+  </section>
 
-    <aside class="panel" id="panel">
-      <button class="closeBtn" id="closeBtn" type="button">Fermer</button>
-      <div>
-        <h3 id="panelTopic">Thème</h3>
-        <p class="sub" id="panelSub"></p>
+  <!-- ================= REVIEW ================= -->
+  <section class="view" id="viewReview" hidden>
+    <div class="viewHead">
+      <div><h2>Réviser</h2><p class="sub" id="reviewSub">Les cartes que tu as aimées reviennent à intervalles croissants : 1, 3, 7 puis 21 jours.</p></div>
+      <div class="seg" id="reviewScope">
+        <button type="button" data-scope="due" class="on">À réviser</button>
+        <button type="button" data-scope="all">Tout revoir</button>
       </div>
-      <div class="stats">
-        <div class="stat like"><b id="nLike">0</b><span>aimées</span></div>
-        <div class="stat"><b id="nSkip">0</b><span>passées</span></div>
-        <div class="stat"><b id="nDeck">0</b><span>à venir</span></div>
+    </div>
+    <div class="reviewWrap" id="reviewWrap"></div>
+  </section>
+
+  <!-- ================= PROFILE ================= -->
+  <section class="view" id="viewProfile" hidden>
+    <div class="viewHead">
+      <div><h2>Ton profil</h2><p class="sub">Tout ce que tu swipes, tous thèmes confondus, dessine ce profil. Il sert à personnaliser chaque nouveau thème dès la première carte.</p></div>
+      <span class="syncPill local" id="syncPill"><i></i><span id="syncTxt">Enregistré dans ce navigateur</span></span>
+    </div>
+    <div class="pgrid">
+      <div class="box wide">
+        <div class="hero" id="heroStats"></div>
       </div>
-      <div>
-        <h3>Ce qui te plaît</h3>
-        <p class="sub">Poids par sous-thème. Un « j'aime » ajoute 2, un « passe » retire 1.</p>
+      <div class="box">
+        <div><h3>Cette semaine</h3><p class="sub">Swipes par jour. Objectif quotidien réglable.</p></div>
+        <div class="week" id="week"></div>
+        <div class="row"><label for="goalInput" style="font-size:.85rem;font-weight:600">Objectif / jour</label><input id="goalInput" type="number" min="5" max="200" step="5"></div>
       </div>
-      <div class="wlist" id="wlist"></div>
-      <h3>Cartes gardées</h3>
-      <ul class="likedList" id="likedList"></ul>
-      <button class="resetBtn" id="resetBtn" type="button">Tout effacer et repartir de zéro</button>
-    </aside>
-  </main>
+      <div class="box">
+        <div><h3>Niveau</h3><p class="sub">Influence la difficulté et la finesse des cartes générées.</p></div>
+        <div class="seg" id="levelSeg">
+          <button type="button" data-level="debutant">Débutant</button>
+          <button type="button" data-level="intermediaire">Intermédiaire</button>
+          <button type="button" data-level="expert">Expert</button>
+        </div>
+        <div><h3>Types de cartes préférés</h3><p class="sub">D'après tes « j'aime ».</p></div>
+        <div class="wlist" id="kindList"></div>
+      </div>
+      <div class="box">
+        <div><h3>Centres d'intérêt</h3><p class="sub">Sous-thèmes que tu aimes, agrégés sur tous les thèmes.</p></div>
+        <div class="wlist" id="interestList"></div>
+      </div>
+      <div class="box">
+        <div><h3>Tes données</h3><p class="sub">Copie ton profil pour le transférer vers un autre appareil ou l'autre version de l'app, puis colle-le ici.</p></div>
+        <div class="row">
+          <button class="ghost" id="exportBtn" type="button">Copier mon profil</button>
+          <button class="ghost" id="importBtn" type="button">Coller un profil</button>
+          <button class="ghost danger" id="wipeBtn" type="button">Tout effacer</button>
+        </div>
+        <textarea class="io" id="ioArea" hidden placeholder="Colle ici un profil exporté, puis clique sur « Importer »."></textarea>
+        <div class="row" id="ioRow" hidden><button class="cta" id="importGo" type="button">Importer</button><button class="ghost" id="importCancel" type="button">Annuler</button></div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="modal" id="modal" hidden>
   <form class="modalCard" id="settingsForm">
     <h3>Connexion à l'IA</h3>
     <p class="note">Cette page appelle directement l'API Anthropic depuis ton navigateur. La clé reste dans ce navigateur et ne part que vers api.anthropic.com. Crée une clé sur <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.</p>
-    <label>Clé API Anthropic
-      <input id="keyInput" type="password" autocomplete="off" placeholder="sk-ant-…">
-    </label>
+    <label>Clé API Anthropic <input id="keyInput" type="password" autocomplete="off" placeholder="sk-ant-…"></label>
     <label>Modèle
       <select id="modelSelect">
         <option value="claude-opus-5">Opus 5 · le plus soigné</option>
@@ -594,29 +525,23 @@
       </select>
     </label>
     <p class="modalErr" id="modalErr" hidden></p>
-    <div class="modalRow">
-      <button class="btn" type="button" id="modalCancel">Annuler</button>
-      <button class="btn primary" type="submit">Enregistrer</button>
-    </div>
+    <div class="modalRow"><button class="btn" type="button" id="modalCancel">Annuler</button><button class="btn primary" type="submit">Enregistrer</button></div>
   </form>
 </div>
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
   const deckEl = $('deck'), statusEl = $('status');
+  const DAY = 86400000;
   const SAMPLE_TOPIC = 'Apprends-moi des mots en espagnol';
-  const SUGGESTIONS = [
-    'Apprends-moi des mots en espagnol',
-    'Les nouvelles du sport',
-    'Histoire de France en anecdotes',
-    'Science du quotidien',
-    'Vocabulaire japonais pour voyager',
-    'Cinéma et séries',
-    'Astronomie',
-    'Économie expliquée simplement',
-  ];
+  const SUGGESTIONS = ['Apprends-moi des mots en espagnol', 'Les nouvelles du sport', 'Histoire de France en anecdotes', 'Science du quotidien', 'Vocabulaire japonais pour voyager', 'Cinéma et séries', 'Astronomie', 'Économie expliquée simplement'];
   const KINDS = { mot: 'Mot', fait: 'Le savais-tu ?', actu: 'Actu', conseil: 'Astuce', citation: 'Citation', info: 'Info' };
+  const LEVELS = { debutant: 'débutant : notions de base, explications très simples, exemples concrets', intermediaire: 'intermédiaire : au-delà des évidences, nuances utiles', expert: 'expert : cas pointus, vocabulaire rare, détails que seuls les connaisseurs savent' };
+  const INTERVALS = [1, 3, 7, 21];
+  const NEWS_RE = /actu|nouvelle|news|résultat|classement|sport|politique|économie|bourse|match|championnat|élection|transfert|marché|tech|dernières|récent/i;
+  const LANGS = [[/espagnol|spanish|español/i, 'es-ES'], [/japonais|japanese/i, 'ja-JP'], [/anglais|english/i, 'en-US'], [/allemand|german|deutsch/i, 'de-DE'], [/italien|italian/i, 'it-IT'], [/portugais|brésilien|portuguese/i, 'pt-PT'], [/néerlandais|dutch|flamand/i, 'nl-NL'], [/chinois|mandarin|chinese/i, 'zh-CN'], [/coréen|korean/i, 'ko-KR'], [/arabe|arabic/i, 'ar-SA'], [/russe|russian/i, 'ru-RU'], [/grec|greek/i, 'el-GR'], [/turc|turkish/i, 'tr-TR'], [/suédois|swedish/i, 'sv-SE'], [/polonais|polish/i, 'pl-PL']];
   const SAMPLE_CARDS = [
     { title: 'la mariposa', body: 'Le papillon.', extra: 'Una mariposa azul se posó en mi mano.', tags: ['animaux', 'nom', 'nature'], kind: 'mot', sample: true },
     { title: 'madrugar', body: 'Se lever très tôt, avant l’aube. Un seul verbe là où le français a besoin d’une phrase.', extra: 'Mañana tengo que madrugar.', tags: ['verbe', 'quotidien'], kind: 'mot', sample: true },
@@ -628,52 +553,150 @@
     { title: 'la vergüenza ajena', body: 'La honte que l’on ressent pour quelqu’un d’autre. Le tréma sur le u indique qu’il se prononce.', extra: 'Sentí vergüenza ajena por él.', tags: ['expression', 'culture', 'émotion'], kind: 'mot', sample: true },
   ];
 
-  const freshState = (topic, deck) => ({ topic, deck: deck || [], seen: [], liked: [], skipped: [], weights: {}, vocab: [] });
-  let state = freshState(SAMPLE_TOPIC, SAMPLE_CARDS.map(c => ({ ...c })));
-  let backend = null;      // { kind: 'sample' | 'api', generate(system, user, {onDelta, signal}) }
-  let loading = false, ctl = null, lastAction = null, interacted = false, aiDead = false;
-  let dragging = false, pendingRender = false, flying = false;
-  let settings = { key: '', model: 'claude-opus-5' };
-
-  // ---------- persistence (per-viewer convenience) ----------
-  const KEY = 'swipe-sache-v2', SKEY = 'swipe-sache-settings';
-  function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
-    try { window.claude?.hot?.snapshot?.(state); } catch (e) {}
-  }
-  function load(hot) {
-    try {
-      const s = hot && hot.topic ? hot : JSON.parse(localStorage.getItem(KEY) || 'null');
-      if (s && s.topic && Array.isArray(s.deck)) state = { ...freshState(s.topic), ...s };
-    } catch (e) {}
-    try { const s = JSON.parse(localStorage.getItem(SKEY) || 'null'); if (s) settings = { ...settings, ...s }; } catch (e) {}
-  }
-  function saveSettings() { try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch (e) {} }
-
-  // ---------- helpers ----------
-  const hue = (s) => { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
+  // ================= state =================
+  const now = () => Date.now();
+  const dayKey = (t = now()) => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const uid8 = () => now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const normTopic = (t) => String(t).toLowerCase().trim().replace(/\s+/g, ' ');
   const norm = (t) => String(t).toLowerCase().trim().replace(/\s+/g, ' ').slice(0, 24);
+
+  const newTheme = (topic, deck) => ({ id: 't' + uid8(), topic, createdAt: now(), lastAt: now(), deck: deck || [], seen: [], liked: [], skipped: [], weights: {}, vocab: [], nLikes: 0, nSkips: 0 });
+  const newProfile = () => ({
+    v: 3, createdAt: now(), updatedAt: now(),
+    settings: { model: 'claude-opus-5', level: 'intermediaire', dailyGoal: 20 },
+    stats: { swipes: 0, likes: 0, reviews: 0, days: {}, streak: 0, best: 0, lastDay: '' },
+    interests: {}, kinds: {},
+    activeThemeId: null, themes: {},
+  });
+  let P = newProfile();
+  let apiKey = '';
+  let backend = null, loading = false, ctl = null, lastAction = null, interacted = false, aiDead = false;
+  let dragging = false, pendingRender = false, flying = false;
+  let currentView = 'swipe';
+  const cur = () => P.themes[P.activeThemeId] || null;
+
+  // ================= storage =================
+  const KEY = 'sas-v3', KKEY = 'sas-key';
+  const store = { db: null, base: null, dirty: new Set(), deleted: new Set(), timer: null, flushing: false, remote: false };
+  function touch(themeId) {
+    P.updatedAt = now();
+    if (themeId) { const t = P.themes[themeId]; if (t) t.lastAt = now(); store.dirty.add(themeId); }
+    store.dirty.add('profile');
+    try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {}
+    try { window.claude?.hot?.snapshot?.(P); } catch (e) {}
+    scheduleFlush();
+  }
+  function loadLocal(hot) {
+    try {
+      const s = hot && hot.v === 3 ? hot : JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (s && s.v === 3) P = { ...newProfile(), ...s, settings: { ...newProfile().settings, ...(s.settings || {}) }, stats: { ...newProfile().stats, ...(s.stats || {}) } };
+      else migrateV2();
+    } catch (e) {}
+    try { apiKey = localStorage.getItem(KKEY) || ''; } catch (e) {}
+    try { const old = JSON.parse(localStorage.getItem('swipe-sache-settings') || 'null'); if (old && old.key && !apiKey) { apiKey = old.key; localStorage.setItem(KKEY, apiKey); } if (old && old.model) P.settings.model = old.model; } catch (e) {}
+    if (!Object.keys(P.themes).length) {
+      const t = newTheme(SAMPLE_TOPIC, SAMPLE_CARDS.map(c => ({ ...c })));
+      P.themes[t.id] = t; P.activeThemeId = t.id;
+    }
+    if (!P.themes[P.activeThemeId]) P.activeThemeId = Object.keys(P.themes)[0];
+  }
+  function migrateV2() {
+    try {
+      const s = JSON.parse(localStorage.getItem('swipe-sache-v2') || 'null');
+      if (!s || !s.topic) return;
+      const t = newTheme(s.topic, s.deck || []);
+      t.seen = s.seen || []; t.weights = s.weights || {}; t.vocab = s.vocab || [];
+      t.liked = (s.liked || []).map(c => ({ ...c, box: 0, due: now() + DAY, likedAt: now() }));
+      t.skipped = (s.skipped || []).map(c => c.title);
+      t.nLikes = t.liked.length; t.nSkips = t.skipped.length;
+      P.themes[t.id] = t; P.activeThemeId = t.id;
+      for (const c of t.liked) { for (const g of c.tags || []) P.interests[g] = (P.interests[g] || 0) + 2; P.kinds[c.kind || 'info'] = (P.kinds[c.kind || 'info'] || 0) + 1; }
+      P.stats.likes = t.nLikes; P.stats.swipes = t.nLikes + t.nSkips;
+    } catch (e) {}
+  }
+  const profileDoc = () => { const { themes, ...rest } = P; return rest; };
+  async function initDb() {
+    if (!window.claude?.use) return;
+    let db = null, user = null;
+    try { [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]); } catch (e) { return; }
+    if (!db || !user) return;
+    let id = null; try { id = await user.id(); } catch (e) {}
+    if (!id) return;
+    store.db = db; store.base = 'data/users/' + id;
+    try {
+      const snap = await db.collection(store.base).get();
+      let remoteP = null; const remoteThemes = {};
+      for (const d of snap.docs) { if (!d.exists) continue; if (d.id === 'profile') remoteP = d.data(); else if (d.id.startsWith('theme_')) remoteThemes[d.id.slice(6)] = d.data(); }
+      if (remoteP && (remoteP.updatedAt || 0) > (P.updatedAt || 0)) {
+        P = { ...newProfile(), ...remoteP, themes: remoteThemes };
+        if (!P.themes[P.activeThemeId]) P.activeThemeId = Object.keys(P.themes)[0] || null;
+        if (!P.activeThemeId) { const t = newTheme(SAMPLE_TOPIC, SAMPLE_CARDS.map(c => ({ ...c }))); P.themes[t.id] = t; P.activeThemeId = t.id; }
+        try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {}
+        renderAll();
+      } else {
+        for (const id of Object.keys(P.themes)) store.dirty.add(id);
+        store.dirty.add('profile');
+        scheduleFlush();
+      }
+      store.remote = true;
+      setSyncPill();
+    } catch (e) { store.db = null; }
+  }
+  function scheduleFlush() {
+    if (!store.db) return;
+    clearTimeout(store.timer);
+    store.timer = setTimeout(flush, 1200);
+  }
+  async function flush() {
+    if (!store.db || store.flushing) { if (store.db) scheduleFlush(); return; }
+    store.flushing = true;
+    const dirty = [...store.dirty]; store.dirty.clear();
+    const deleted = [...store.deleted]; store.deleted.clear();
+    try {
+      for (const id of deleted) await store.db.doc(store.base + '/theme_' + id).delete();
+      for (const id of dirty) {
+        if (id === 'profile') await store.db.doc(store.base + '/profile').set(profileDoc());
+        else if (P.themes[id]) await store.db.doc(store.base + '/theme_' + id).set(trimTheme(P.themes[id]));
+      }
+    } catch (e) { for (const id of dirty) store.dirty.add(id); for (const id of deleted) store.deleted.add(id); }
+    store.flushing = false;
+    if (store.dirty.size || store.deleted.size) scheduleFlush();
+  }
+  function trimTheme(t) {
+    if (t.liked.length > 300) t.liked.splice(0, t.liked.length - 300);
+    if (t.seen.length > 400) t.seen.splice(0, t.seen.length - 400);
+    if (t.skipped.length > 150) t.skipped.splice(0, t.skipped.length - 150);
+    if (t.deck.length > 30) t.deck.length = 30;
+    return t;
+  }
+  function setSyncPill() {
+    const pill = $('syncPill');
+    pill.classList.toggle('local', !store.remote);
+    $('syncTxt').textContent = store.remote ? 'Synchronisé avec ton compte claude.ai' : 'Enregistré dans ce navigateur';
+  }
+
+  // ================= ui helpers =================
+  const hue = (s) => { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
   function setStatus(msg, kind, retry) {
     statusEl.className = 'status' + (kind ? ' ' + kind : '');
     statusEl.textContent = '';
     if (kind === 'busy') { const d = document.createElement('span'); d.className = 'dot'; statusEl.append(d); }
     if (msg) statusEl.append(msg);
-    if (kind === 'busy') {
-      const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Stop';
-      b.onclick = () => ctl?.abort(); statusEl.append(b);
-    }
-    if (retry) {
-      const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Réessayer';
-      b.onclick = () => fetchMore(6); statusEl.append(b);
-    }
+    if (kind === 'busy') { const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Stop'; b.onclick = () => ctl?.abort(); statusEl.append(b); }
+    if (retry) { const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Réessayer'; b.onclick = () => fetchMore(6); statusEl.append(b); }
   }
+  let toastT;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const fmtAgo = (t) => { const d = now() - t; if (d < 3600000) return 'à l’instant'; if (d < DAY) return 'aujourd’hui'; if (d < 2 * DAY) return 'hier'; return 'il y a ' + Math.floor(d / DAY) + ' j'; };
+  const langOf = (topic) => { for (const [re, l] of LANGS) if (re.test(topic)) return l; return null; };
 
-  // ---------- prompt ----------
+  // ================= prompts =================
   const SYSTEM = `Tu alimentes une application de type « Tinder de l'info » : l'utilisateur swipe des cartes courtes et ses « j'aime » servent à renforcer ce genre d'info dans les cartes suivantes.
 
 Règles :
 1. Environ 70 % des cartes prolongent ce que l'utilisateur aime (mêmes sous-thèmes, même angle, même niveau que les cartes aimées). Les 30 % restantes explorent des sous-thèmes voisins du thème pour découvrir de nouveaux goûts. Évite les sous-thèmes évités.
-2. S'il n'y a encore aucun goût connu, varie au maximum les sous-thèmes.
+2. S'il n'y a encore aucun goût connu pour ce thème, appuie-toi sur le profil général de l'utilisateur, puis varie au maximum.
 3. Chaque carte est autonome, précise et vérifiable. "body" fait au plus 220 caractères. Pas de remplissage, pas d'introduction.
 4. Langue : le français. Si le thème est l'apprentissage d'une langue, "title" est le mot ou l'expression dans la langue cible, "body" sa traduction et une nuance utile, "extra" un exemple de phrase dans la langue cible.
 5. Si le thème touche à l'actualité : tu n'as pas accès à internet. Donne des faits datés que tu connais avec certitude et indique la période dans "extra" (ex. « Saison 2024-2025 »). Ne fabrique jamais de résultat ni de chiffre.
@@ -684,65 +707,70 @@ Règles :
 Format de sortie, strict : une carte par ligne, chaque ligne est un objet JSON complet et compact, sans tableau englobant, sans texte avant ou après, sans code fence. Écris la première ligne immédiatement.
 Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una mariposa se posó en la flor.","tags":["animaux","nom"],"kind":"mot"}`;
 
+  function globalProfileText() {
+    const ints = Object.entries(P.interests).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => `${k} (+${v})`).join(', ') || 'rien encore';
+    const kinds = Object.entries(P.kinds).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${KINDS[k] || k} (${v})`).join(', ') || 'rien encore';
+    const themes = Object.values(P.themes).map(t => t.topic).slice(0, 8).join(' ; ') || 'aucun';
+    return `Profil général (tous thèmes confondus) :
+- Niveau visé : ${LEVELS[P.settings.level] || LEVELS.intermediaire}
+- Centres d'intérêt récurrents : ${ints}
+- Types de cartes préférés : ${kinds}
+- Thèmes déjà explorés : ${themes}`;
+  }
   function buildUser(n) {
-    const w = Object.entries(state.weights);
+    const t = cur();
+    const w = Object.entries(t.weights);
     const liked = w.filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 8);
     const avoided = w.filter(([, v]) => v < 0).sort((a, b) => a[1] - b[1]).slice(0, 5);
     const fmt = (arr) => arr.length ? arr.map(([k, v]) => `${k} (${v > 0 ? '+' : ''}${v})`).join(', ') : 'aucun pour l’instant';
-    const titles = (arr, k) => arr.slice(-k).map(c => `« ${c.title} »`).join(', ') || 'aucune';
-    const seen = state.seen.concat(state.deck.map(c => c.title)).slice(-70).map(t => `« ${t} »`).join(', ') || 'aucun';
-    const vocab = state.vocab.slice(-30).join(', ') || 'aucun';
-    return `Thème demandé : « ${state.topic} »
+    const seen = t.seen.concat(t.deck.map(c => c.title)).slice(-70).map(x => `« ${x} »`).join(', ') || 'aucun';
+    return `Thème demandé : « ${t.topic} »
 
-Profil de l'utilisateur pour ce thème :
+${globalProfileText()}
+
+Profil pour ce thème :
 - Sous-thèmes aimés (poids) : ${fmt(liked)}
 - Sous-thèmes évités (poids) : ${fmt(avoided)}
-- Dernières cartes aimées : ${titles(state.liked, 12)}
-- Dernières cartes passées : ${titles(state.skipped, 8)}
-- Tags déjà utilisés (réutilise-les quand ils conviennent) : ${vocab}
+- Dernières cartes aimées : ${t.liked.slice(-12).map(c => `« ${c.title} »`).join(', ') || 'aucune'}
+- Dernières cartes passées : ${t.skipped.slice(-8).map(x => `« ${x} »`).join(', ') || 'aucune'}
+- Tags déjà utilisés (réutilise-les quand ils conviennent) : ${t.vocab.slice(-30).join(', ') || 'aucun'}
 - Titres déjà vus, à ne jamais répéter : ${seen}
 
 Génère ${n} nouvelles cartes, une par ligne.`;
   }
+  const SYSTEM_DEEP = `Tu approfondis une carte d'info pour un utilisateur curieux. Réponds en français, en 3 ou 4 phrases précises et concrètes, sans introduction, sans conclusion, sans markdown ni liste. Apporte ce que la carte ne disait pas : contexte, origine, chiffre clé, cas d'usage. Pour un mot étranger : étymologie, nuance d'emploi, une expression courante qui l'utilise. Tu n'as pas accès à internet : reste sur ce que tu sais avec certitude.`;
+  const SYSTEM_SUGGEST = `Tu proposes des thèmes d'exploration pour une app de cartes d'info à swiper. À partir du profil, propose 4 thèmes précis, variés, formulés comme une demande courte en français (ex. « Expressions idiomatiques italiennes », « Histoire des Jeux olympiques »). Au moins un thème doit prolonger un intérêt existant sous un angle neuf, au moins un doit ouvrir vers un domaine voisin inattendu. Ne reprends aucun thème déjà exploré.
+Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":"..."} où why fait au plus 80 caractères. Rien d'autre.`;
 
-  // ---------- backends ----------
+  // ================= backends =================
   async function detectBackend() {
     let s = null;
     try { s = await window.claude?.use?.('sample'); } catch (e) { s = null; }
     if (s) {
       return {
         kind: 'sample',
-        async generate(system, user, { onDelta, signal }) {
+        async generate(system, user, { onDelta, signal, tier }) {
           let prev = 0;
           await s(system + '\n\n' + user, {
-            modelTier: 'quick', cache: false, signal,
+            modelTier: tier || 'quick', cache: false, signal,
             onText: ({ text }) => { onDelta(text.slice(prev)); prev = text.length; },
           });
         },
       };
     }
-    if (window.claude) return null; // inside a Claude viewer but sampling unavailable
+    if (window.claude) return null;
     return {
       kind: 'api',
       async generate(system, user, { onDelta, signal }) {
-        if (!settings.key) throw { code: 'no_key' };
-        const model = settings.model || 'claude-opus-5';
+        if (!apiKey) throw { code: 'no_key' };
+        const model = P.settings.model || 'claude-opus-5';
         const body = { model, max_tokens: 8000, stream: true, system, messages: [{ role: 'user', content: user }] };
-        const headers = {
-          'content-type': 'application/json',
-          'x-api-key': settings.key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        };
+        const headers = { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' };
         if (model === 'claude-opus-5' || model === 'claude-sonnet-5') body.output_config = { effort: 'low' };
         if (model === 'claude-opus-5') { body.fallbacks = 'default'; headers['anthropic-beta'] = 'server-side-fallback-2026-07-01'; }
         let res;
-        try {
-          res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body), signal });
-        } catch (e) {
-          if (e && e.name === 'AbortError') throw { code: 'cancelled' };
-          throw { code: 'upstream_error', message: String(e) };
-        }
+        try { res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body), signal }); }
+        catch (e) { if (e && e.name === 'AbortError') throw { code: 'cancelled' }; throw { code: 'upstream_error', message: String(e) }; }
         if (!res.ok) {
           const t = await res.text().catch(() => '');
           const code = res.status === 401 ? 'bad_key' : res.status === 429 ? 'rate_limited' : res.status === 400 ? 'bad_request' : 'upstream_error';
@@ -767,30 +795,6 @@ Génère ${n} nouvelles cartes, une par ligne.`;
       },
     };
   }
-
-  // ---------- card parsing (one JSON object per line, as it streams) ----------
-  function makeLineSink(onCard) {
-    let buf = '';
-    const eat = (line) => {
-      const s = line.trim().replace(/^[\s,\[\]`]+|[\s,\[\]`]+$/g, '');
-      if (!s.startsWith('{')) return;
-      try { onCard(JSON.parse(s)); } catch (e) {}
-    };
-    return {
-      push(delta) { buf += delta; let i; while ((i = buf.indexOf('\n')) >= 0) { eat(buf.slice(0, i)); buf = buf.slice(i + 1); } },
-      flush() { if (buf.trim()) eat(buf); buf = ''; },
-    };
-  }
-  function acceptCard(c) {
-    if (!c || typeof c.title !== 'string' || typeof c.body !== 'string') return null;
-    const title = c.title.trim(); if (!title) return null;
-    const known = new Set(state.seen.map(norm).concat(state.deck.map(x => norm(x.title))));
-    if (known.has(norm(title))) return null;
-    const tags = (Array.isArray(c.tags) ? c.tags : []).map(norm).filter(Boolean).slice(0, 3);
-    for (const t of tags) if (!state.vocab.includes(t)) state.vocab.push(t);
-    return { title, body: c.body.trim().slice(0, 400), extra: typeof c.extra === 'string' ? c.extra.trim().slice(0, 240) : '', tags, kind: KINDS[c.kind] ? c.kind : 'info' };
-  }
-
   const ERR = {
     rate_limited: 'Trop de demandes pour le moment. Réessaie dans une minute.',
     session_expired: 'Ta session a expiré. Reconnecte-toi puis réessaie.',
@@ -804,26 +808,45 @@ Génère ${n} nouvelles cartes, une par ligne.`;
     no_key: 'Ajoute ta clé API Anthropic pour générer des cartes.',
   };
   const HIDE = new Set(['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed']);
+  const aiReady = () => backend && !aiDead && !(backend.kind === 'api' && !apiKey);
+
+  function makeLineSink(onObj) {
+    let buf = '';
+    const eat = (line) => { const s = line.trim().replace(/^[\s,\[\]`]+|[\s,\[\]`]+$/g, ''); if (!s.startsWith('{')) return; try { onObj(JSON.parse(s)); } catch (e) {} };
+    return {
+      push(delta) { buf += delta; let i; while ((i = buf.indexOf('\n')) >= 0) { eat(buf.slice(0, i)); buf = buf.slice(i + 1); } },
+      flush() { if (buf.trim()) eat(buf); buf = ''; },
+    };
+  }
+  function acceptCard(t, c) {
+    if (!c || typeof c.title !== 'string' || typeof c.body !== 'string') return null;
+    const title = c.title.trim(); if (!title) return null;
+    const known = new Set(t.seen.map(norm).concat(t.deck.map(x => norm(x.title))));
+    if (known.has(norm(title))) return null;
+    const tags = (Array.isArray(c.tags) ? c.tags : []).map(norm).filter(Boolean).slice(0, 3);
+    for (const g of tags) if (!t.vocab.includes(g)) t.vocab.push(g);
+    return { title, body: c.body.trim().slice(0, 400), extra: typeof c.extra === 'string' ? c.extra.trim().slice(0, 240) : '', tags, kind: KINDS[c.kind] ? c.kind : 'info' };
+  }
 
   async function fetchMore(n) {
-    if (!backend || loading || aiDead) return;
-    if (backend.kind === 'api' && !settings.key) { renderDeck(); return; }
-    loading = true;
-    ctl = new AbortController();
+    const t = cur();
+    if (!t || !aiReady() || loading) { renderDeck(); return; }
+    const themeId = t.id;
+    loading = true; ctl = new AbortController();
     setStatus('Claude écrit les prochaines cartes…', 'busy');
     let got = 0;
     const sink = makeLineSink((raw) => {
-      const card = acceptCard(raw); if (!card) return;
-      const wasVisible = state.deck.length;
-      state.deck.push(card); got++;
-      if (wasVisible < 3) renderDeck(true); else $('nDeck').textContent = state.deck.length;
+      const th = P.themes[themeId]; if (!th) return;
+      const card = acceptCard(th, raw); if (!card) return;
+      const wasVisible = th.deck.length;
+      th.deck.push(card); got++;
+      if (P.activeThemeId === themeId) { if (wasVisible < 3) renderDeck(true); else $('nDeck').textContent = th.deck.length; }
     });
     try {
-      await backend.generate(SYSTEM, buildUser(n), { onDelta: (d) => sink.push(d), signal: ctl.signal });
+      await backend.generate(SYSTEM, buildUser(n), { onDelta: (d) => sink.push(d), signal: ctl.signal, tier: NEWS_RE.test(t.topic) ? 'default' : 'quick' });
       sink.flush();
       if (!got) throw { code: 'empty_completion' };
-      save();
-      setStatus('');
+      touch(themeId); setStatus('');
     } catch (e) {
       sink.flush();
       const code = e && e.code ? e.code : 'upstream_error';
@@ -831,247 +854,490 @@ Génère ${n} nouvelles cartes, une par ligne.`;
       else if (HIDE.has(code)) { aiDead = true; setStatus('L’IA n’est pas autorisée dans cette vue. Tu peux quand même swiper les cartes déjà là.', 'err'); }
       else if (code === 'bad_key' || code === 'no_key') { setStatus(ERR[code], 'err'); openSettings(ERR[code]); }
       else setStatus(ERR[code] || ERR.upstream_error, 'err', got === 0);
-      if (got) save();
+      if (got) touch(themeId);
     } finally {
       loading = false; ctl = null;
       renderDeck(); renderPanel();
     }
   }
+  function maybePrefetch() { const t = cur(); if (interacted && t && aiReady() && !loading && t.deck.length <= 4) fetchMore(6); }
 
-  function maybePrefetch() {
-    if (!interacted || !backend || loading || aiDead) return;
-    if (state.deck.length <= 4) fetchMore(state.deck.length === 0 ? 6 : 6);
+  // ================= deck =================
+  function speak(text, lang) {
+    try {
+      if (!('speechSynthesis' in window)) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = .9;
+      speechSynthesis.speak(u);
+    } catch (e) {}
   }
-
-  // ---------- deck rendering ----------
-  function makeCard(c, i) {
-    const el = document.createElement('article');
-    el.className = 'card' + (i === 0 ? ' top' : '');
-    el.style.setProperty('--i', i);
-    el.style.setProperty('--r', i === 0 ? 0 : (i % 2 ? -2.2 : 2.2));
-    el.style.setProperty('--h', hue(c.tags[0] || c.title));
-    const top = document.createElement('div'); top.className = 'cardTop';
-    const eyebrow = document.createElement('div'); eyebrow.className = 'eyebrow';
-    eyebrow.append(KINDS[c.kind] || 'Info');
-    if (c.sample) { const ex = document.createElement('span'); ex.className = 'ex'; ex.textContent = 'exemple'; eyebrow.append(ex); }
-    const h2 = document.createElement('h2'); h2.textContent = c.title;
-    top.append(eyebrow, h2);
-    const bottom = document.createElement('div'); bottom.className = 'cardBottom';
-    const p = document.createElement('p'); p.textContent = c.body; bottom.append(p);
-    if (c.extra) { const x = document.createElement('p'); x.className = 'extra'; x.textContent = c.extra; bottom.append(x); }
-    const tags = document.createElement('div'); tags.className = 'tags';
-    for (const t of c.tags) { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tags.append(s); }
-    bottom.append(tags);
-    const sl = document.createElement('div'); sl.className = 'stamp like'; sl.textContent = 'J’AIME';
-    const ss = document.createElement('div'); ss.className = 'stamp skip'; ss.textContent = 'PASSE';
-    el.append(top, bottom, sl, ss);
-    return el;
+  function makeCard(c, i, t) {
+    const card = el('article', 'card' + (i === 0 ? ' top' : ''));
+    card.style.setProperty('--i', i);
+    card.style.setProperty('--r', i === 0 ? 0 : (i % 2 ? -2.2 : 2.2));
+    card.style.setProperty('--h', hue(c.tags[0] || c.title));
+    const top = el('div', 'cardTop');
+    const eyebrow = el('div', 'eyebrow'); eyebrow.append(KINDS[c.kind] || 'Info');
+    if (c.sample) eyebrow.append(el('span', 'ex', 'exemple'));
+    const titleRow = el('div', 'titleRow');
+    titleRow.append(el('h2', null, c.title));
+    const lang = langOf(t.topic);
+    if (lang && c.kind === 'mot' && 'speechSynthesis' in window) {
+      const sp = el('button', 'speak'); sp.type = 'button'; sp.title = 'Écouter'; sp.setAttribute('aria-label', 'Écouter la prononciation');
+      sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+      sp.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+      sp.onclick = (ev) => { ev.stopPropagation(); speak(c.title, lang); };
+      titleRow.append(sp);
+    }
+    top.append(eyebrow, titleRow);
+    const bottom = el('div', 'cardBottom');
+    bottom.append(el('p', null, c.body));
+    if (c.extra) bottom.append(el('p', 'extra', c.extra));
+    if (c.deep) bottom.append(el('div', 'deep', c.deep));
+    const foot = el('div', 'cardFoot');
+    const tags = el('div', 'tags'); for (const g of c.tags) tags.append(el('span', 'tag', g));
+    foot.append(tags);
+    if (i === 0 && !c.deep && aiReady()) {
+      const b = el('button', 'deepBtn'); b.type = 'button';
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Approfondir';
+      b.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+      b.onclick = (ev) => { ev.stopPropagation(); deepen(c, t, bottom, b); };
+      foot.append(b);
+    }
+    bottom.append(foot);
+    card.append(top, bottom, el('div', 'stamp like', 'J’AIME'), el('div', 'stamp skip', 'PASSE'));
+    return card;
   }
-
+  async function deepen(c, t, bottom, btn) {
+    if (!aiReady()) return;
+    btn.disabled = true; btn.textContent = 'Claude rédige…';
+    const box = el('div', 'deep', ''); bottom.insertBefore(box, bottom.querySelector('.cardFoot'));
+    let text = '';
+    const c2 = new AbortController();
+    try {
+      await backend.generate(SYSTEM_DEEP, `Thème : « ${t.topic} »\nCarte : ${JSON.stringify({ title: c.title, body: c.body, extra: c.extra })}`, { onDelta: (d) => { text += d; box.textContent = text; }, signal: c2.signal, tier: 'default' });
+      c.deep = text.trim(); btn.remove(); touch(t.id);
+    } catch (e) {
+      box.textContent = text || 'Impossible d’approfondir pour le moment.'; btn.disabled = false; btn.textContent = 'Réessayer';
+    }
+  }
   function renderDeck(animate) {
     if (dragging || flying) { pendingRender = true; return; }
     pendingRender = false;
+    const t = cur();
     deckEl.textContent = '';
-    const top = state.deck.slice(0, 3);
+    const top = t ? t.deck.slice(0, 3) : [];
     for (let i = top.length - 1; i >= 0; i--) {
-      const el = makeCard(top[i], i);
-      if (i === 0) { attachDrag(el); if (animate) el.classList.add('enter'); }
-      deckEl.append(el);
+      const card = makeCard(top[i], i, t);
+      if (i === 0) { attachDrag(card); if (animate) card.classList.add('enter'); }
+      deckEl.append(card);
     }
     if (!top.length) {
-      const e = document.createElement('div'); e.className = 'empty';
-      const s = document.createElement('strong');
-      const p = document.createElement('p');
+      const e = el('div', 'empty'); const s = el('strong'); const p = el('p');
       if (loading) { s.textContent = 'Claude réfléchit…'; p.textContent = 'La première carte arrive dans quelques secondes.'; }
-      else if (backend && backend.kind === 'api' && !settings.key) {
+      else if (backend && backend.kind === 'api' && !apiKey) {
         s.textContent = 'Connecte l’IA'; p.textContent = 'Ajoute ta clé API Anthropic pour que Claude génère les cartes de ton thème.';
-        const b = document.createElement('button'); b.type = 'button'; b.className = 'cta'; b.textContent = 'Ajouter ma clé'; b.onclick = () => openSettings(); e.append(s, p, b); deckEl.append(e);
-        $('nDeck').textContent = 0; $('undoBtn').disabled = !lastAction; $('skipBtn').disabled = $('likeBtn').disabled = true; return;
+        const b = el('button', 'cta', 'Ajouter ma clé'); b.type = 'button'; b.onclick = () => openSettings(); e.append(s, p, b);
       }
-      else if (!backend || aiDead) { s.textContent = 'Plus de cartes'; p.textContent = 'L’IA n’est pas disponible dans cette vue pour en générer d’autres.'; }
-      else { s.textContent = 'Plus de cartes'; p.textContent = 'Lance un thème ci-dessus, ou réessaie.'; }
-      e.append(s, p); deckEl.append(e);
+      else if (!backend || aiDead) { s.textContent = 'Plus de cartes'; p.textContent = 'L’IA n’est pas disponible dans cette vue pour en générer d’autres.'; e.append(s, p); }
+      else { s.textContent = 'Plus de cartes'; p.textContent = 'Lance la suite de ce thème ou choisis-en un autre.'; const b = el('button', 'cta', 'Générer la suite'); b.type = 'button'; b.onclick = () => { interacted = true; fetchMore(6); }; e.append(s, p, b); }
+      deckEl.append(e);
     }
-    $('nDeck').textContent = state.deck.length;
+    $('nDeck').textContent = t ? t.deck.length : 0;
     $('undoBtn').disabled = !lastAction;
     $('skipBtn').disabled = $('likeBtn').disabled = !top.length;
   }
-
-  // ---------- swipe ----------
-  function attachDrag(el) {
+  function attachDrag(card) {
     let sx = 0, sy = 0, dx = 0, dy = 0, active = false;
-    const stampL = el.querySelector('.stamp.like'), stampS = el.querySelector('.stamp.skip');
-    el.addEventListener('pointerdown', (ev) => {
+    const stampL = card.querySelector('.stamp.like'), stampS = card.querySelector('.stamp.skip');
+    card.addEventListener('pointerdown', (ev) => {
       if (flying) return;
       if (ev.button !== 0 && ev.pointerType === 'mouse') return;
       active = true; dragging = true; sx = ev.clientX; sy = ev.clientY; dx = dy = 0;
-      el.classList.add('dragging'); el.classList.remove('enter'); el.setPointerCapture(ev.pointerId);
+      card.classList.add('dragging'); card.classList.remove('enter'); card.setPointerCapture(ev.pointerId);
     });
-    el.addEventListener('pointermove', (ev) => {
+    card.addEventListener('pointermove', (ev) => {
       if (!active) return;
       dx = ev.clientX - sx; dy = ev.clientY - sy;
-      el.style.transform = `translate(${dx}px, ${dy * .4}px) rotate(${dx / 18}deg)`;
+      card.style.transform = `translate(${dx}px, ${dy * .4}px) rotate(${dx / 18}deg)`;
       stampL.style.opacity = Math.min(1, Math.max(0, dx / 90));
       stampS.style.opacity = Math.min(1, Math.max(0, -dx / 90));
     });
     const end = () => {
       if (!active) return; active = false; dragging = false;
-      el.classList.remove('dragging');
-      if (Math.abs(dx) > 100) fly(el, dx > 0 ? 'like' : 'skip');
-      else { el.style.transform = ''; stampL.style.opacity = 0; stampS.style.opacity = 0; if (pendingRender) renderDeck(); }
+      card.classList.remove('dragging');
+      if (Math.abs(dx) > 100) fly(card, dx > 0 ? 'like' : 'skip');
+      else { card.style.transform = ''; stampL.style.opacity = 0; stampS.style.opacity = 0; if (pendingRender) renderDeck(); }
     };
-    el.addEventListener('pointerup', end);
-    el.addEventListener('pointercancel', end);
+    card.addEventListener('pointerup', end);
+    card.addEventListener('pointercancel', end);
   }
-
-  function fly(el, dir) {
-    if (flying || !state.deck.length) return;
+  function fly(card, dir) {
+    if (flying || !cur() || !cur().deck.length) return;
     flying = true;
     const sign = dir === 'like' ? 1 : -1;
-    el.querySelector('.stamp.' + dir).style.opacity = 1;
-    el.style.transition = 'transform .32s ease-in, opacity .32s ease-in';
-    el.style.transform = `translate(${sign * (window.innerWidth + 200)}px, -40px) rotate(${sign * 25}deg)`;
-    el.style.opacity = '0';
+    card.querySelector('.stamp.' + dir).style.opacity = 1;
+    card.style.transition = 'transform .32s ease-in, opacity .32s ease-in';
+    card.style.transform = `translate(${sign * (window.innerWidth + 200)}px, -40px) rotate(${sign * 25}deg)`;
+    card.style.opacity = '0';
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     setTimeout(() => { flying = false; commit(dir); }, reduced ? 0 : 280);
   }
-
+  function bumpStats(dir) {
+    const s = P.stats, today = dayKey();
+    s.swipes++; if (dir === 'like') s.likes++;
+    const d = s.days[today] || { swipes: 0, likes: 0 }; d.swipes++; if (dir === 'like') d.likes++; s.days[today] = d;
+    if (s.lastDay !== today) {
+      const yest = dayKey(now() - DAY);
+      s.streak = s.lastDay === yest ? s.streak + 1 : 1;
+      s.lastDay = today; s.best = Math.max(s.best, s.streak);
+    }
+    const keys = Object.keys(s.days).sort(); while (keys.length > 60) delete s.days[keys.shift()];
+  }
   function commit(dir) {
     interacted = true;
-    const card = state.deck.shift(); if (!card) { renderDeck(); return; }
-    state.seen.push(card.title);
+    const t = cur(); const card = t && t.deck.shift();
+    if (!card) { renderDeck(); return; }
+    t.seen.push(card.title);
     const delta = dir === 'like' ? 2 : -1;
-    for (const t of card.tags) state.weights[t] = (state.weights[t] || 0) + delta;
-    (dir === 'like' ? state.liked : state.skipped).push(card);
-    lastAction = { card, dir };
-    save(); renderDeck(true); renderPanel(); maybePrefetch();
+    for (const g of card.tags) { t.weights[g] = (t.weights[g] || 0) + delta; P.interests[g] = (P.interests[g] || 0) + delta; }
+    if (dir === 'like') { t.liked.push({ ...card, box: 0, due: now() + DAY, likedAt: now() }); t.nLikes++; P.kinds[card.kind] = (P.kinds[card.kind] || 0) + 1; }
+    else { t.skipped.push(card.title); t.nSkips++; }
+    bumpStats(dir);
+    lastAction = { card, dir, themeId: t.id };
+    touch(t.id); renderDeck(true); renderPanel(); renderHeader(); maybePrefetch();
   }
-
   function undo() {
     if (!lastAction || flying) return;
-    const { card, dir } = lastAction; lastAction = null;
+    const { card, dir, themeId } = lastAction; lastAction = null;
+    const t = P.themes[themeId]; if (!t) return;
     const delta = dir === 'like' ? 2 : -1;
-    for (const t of card.tags) { state.weights[t] = (state.weights[t] || 0) - delta; if (state.weights[t] === 0) delete state.weights[t]; }
-    const list = dir === 'like' ? state.liked : state.skipped;
-    const i = list.lastIndexOf(card); if (i >= 0) list.splice(i, 1);
-    const j = state.seen.lastIndexOf(card.title); if (j >= 0) state.seen.splice(j, 1);
-    state.deck.unshift(card);
-    save(); renderDeck(true); renderPanel();
+    for (const g of card.tags) {
+      t.weights[g] = (t.weights[g] || 0) - delta; if (!t.weights[g]) delete t.weights[g];
+      P.interests[g] = (P.interests[g] || 0) - delta; if (!P.interests[g]) delete P.interests[g];
+    }
+    if (dir === 'like') { const i = t.liked.findIndex(c => c.title === card.title); if (i >= 0) t.liked.splice(i, 1); t.nLikes--; P.kinds[card.kind] = Math.max(0, (P.kinds[card.kind] || 1) - 1); P.stats.likes--; }
+    else { const i = t.skipped.lastIndexOf(card.title); if (i >= 0) t.skipped.splice(i, 1); t.nSkips--; }
+    const j = t.seen.lastIndexOf(card.title); if (j >= 0) t.seen.splice(j, 1);
+    P.stats.swipes--; const d = P.stats.days[dayKey()]; if (d) { d.swipes = Math.max(0, d.swipes - 1); if (dir === 'like') d.likes = Math.max(0, d.likes - 1); }
+    t.deck.unshift(card);
+    if (P.activeThemeId !== themeId) activateTheme(themeId);
+    touch(t.id); renderDeck(true); renderPanel(); renderHeader();
   }
+  const swipeTop = (dir) => { const top = deckEl.querySelector('.card.top'); if (top) fly(top, dir); };
 
-  function swipeTop(dir) {
-    const top = deckEl.querySelector('.card.top');
-    if (top) fly(top, dir);
-  }
-
-  // ---------- panel ----------
+  // ================= side panel =================
   function renderPanel() {
-    $('panelTopic').textContent = state.topic;
-    const isSample = state.deck.every(c => c.sample) && !state.liked.length && !state.skipped.length;
-    $('panelSub').textContent = isSample ? 'Jeu d’exemple. Lance un thème pour que Claude génère la suite.' : 'Les cartes suivantes sont générées par Claude à partir de tes swipes.';
-    $('nLike').textContent = state.liked.length;
-    $('nSkip').textContent = state.skipped.length;
-    $('nDeck').textContent = state.deck.length;
-    const wl = $('wlist'); wl.textContent = '';
-    const entries = Object.entries(state.weights).sort((a, b) => b[1] - a[1]);
-    if (!entries.length) { const n = document.createElement('p'); n.className = 'none'; n.textContent = 'Swipe quelques cartes pour dessiner ton profil.'; wl.append(n); }
+    const t = cur(); if (!t) return;
+    $('panelTopic').textContent = t.topic;
+    const isSample = t.deck.every(c => c.sample) && !t.liked.length && !t.skipped.length;
+    $('panelSub').textContent = isSample ? 'Jeu d’exemple. Lance un thème pour que Claude génère la suite.' : 'Cartes générées par Claude à partir de tes swipes et de ton profil.';
+    $('nLike').textContent = t.nLikes; $('nSkip').textContent = t.nSkips; $('nDeck').textContent = t.deck.length;
+    renderBars($('wlist'), Object.entries(t.weights), 'Swipe quelques cartes pour dessiner ton profil sur ce thème.');
+    const ll = $('likedList'); ll.textContent = '';
+    if (!t.liked.length) ll.append(el('p', 'none', 'Aucune carte gardée pour l’instant.'));
+    for (const c of t.liked.slice().reverse().slice(0, 40)) {
+      const li = el('li'); li.style.setProperty('--h', hue(c.tags[0] || c.title));
+      li.append(el('b', null, c.title), el('span', null, c.body)); ll.append(li);
+    }
+  }
+  function renderBars(container, entries, emptyMsg, labelFn) {
+    container.textContent = '';
+    entries = entries.filter(([, v]) => v !== 0).sort((a, b) => b[1] - a[1]);
+    if (!entries.length) { container.append(el('p', 'none', emptyMsg)); return; }
     const max = Math.max(1, ...entries.map(([, v]) => Math.abs(v)));
     for (const [k, v] of entries.slice(0, 14)) {
-      const row = document.createElement('div'); row.className = 'wrow' + (v < 0 ? ' neg' : '');
-      const name = document.createElement('span'); name.className = 'name'; name.textContent = k;
-      const bar = document.createElement('span'); bar.className = 'bar';
-      const fill = document.createElement('i'); fill.style.width = (Math.abs(v) / max * 100) + '%'; bar.append(fill);
-      const n = document.createElement('span'); n.className = 'n'; n.textContent = (v > 0 ? '+' : '') + v;
-      row.append(name, bar, n); wl.append(row);
-    }
-    const ll = $('likedList'); ll.textContent = '';
-    if (!state.liked.length) { const n = document.createElement('p'); n.className = 'none'; n.textContent = 'Aucune carte gardée pour l’instant.'; ll.append(n); }
-    for (const c of state.liked.slice().reverse().slice(0, 40)) {
-      const li = document.createElement('li'); li.style.setProperty('--h', hue(c.tags[0] || c.title));
-      const b = document.createElement('b'); b.textContent = c.title;
-      const s = document.createElement('span'); s.textContent = c.body;
-      li.append(b, s); ll.append(li);
+      const row = el('div', 'wrow' + (v < 0 ? ' neg' : ''));
+      const bar = el('span', 'bar'); const fill = el('i'); fill.style.width = (Math.abs(v) / max * 100) + '%'; bar.append(fill);
+      row.append(el('span', 'name', labelFn ? labelFn(k) : k), bar, el('span', 'n', (v > 0 ? '+' : '') + v));
+      container.append(row);
     }
   }
 
-  // ---------- settings modal ----------
-  function openSettings(msg) {
-    $('keyInput').value = settings.key || '';
-    $('modelSelect').value = settings.model || 'claude-opus-5';
-    const err = $('modalErr'); err.hidden = !msg; err.textContent = msg || '';
-    $('modal').hidden = false;
-    setTimeout(() => $('keyInput').focus(), 0);
+  // ================= header =================
+  function dueCards() {
+    const out = []; const n = now();
+    for (const t of Object.values(P.themes)) for (const c of t.liked) if ((c.due || 0) <= n) out.push({ t, c });
+    return out;
   }
-  function closeSettings() { $('modal').hidden = true; }
+  function renderHeader() {
+    const s = P.stats, today = s.days[dayKey()] || { swipes: 0 };
+    const goal = P.settings.dailyGoal || 20;
+    const frac = Math.min(1, today.swipes / goal);
+    $('ringProg').setAttribute('stroke-dasharray', (frac * 81.7).toFixed(1) + ' 81.7');
+    $('goalTxt').textContent = today.swipes + '/' + goal;
+    const alive = s.lastDay === dayKey() || s.lastDay === dayKey(now() - DAY);
+    $('streakTxt').textContent = alive ? s.streak : 0;
+    const due = dueCards().length;
+    $('dueBadge').hidden = !due; $('dueBadge').textContent = due;
+    const nt = Object.keys(P.themes).length;
+    $('nThemesBadge').hidden = nt < 2; $('nThemesBadge').textContent = nt;
+  }
+
+  // ================= views =================
+  function showView(name) {
+    currentView = name;
+    for (const b of document.querySelectorAll('.tab')) b.classList.toggle('on', b.dataset.view === name);
+    $('viewSwipe').hidden = name !== 'swipe';
+    $('viewThemes').hidden = name !== 'themes';
+    $('viewReview').hidden = name !== 'review';
+    $('viewProfile').hidden = name !== 'profile';
+    $('app').classList.toggle('oneScreen', name === 'swipe' || name === 'review');
+    $('panel').classList.remove('open');
+    if (name === 'themes') renderThemes();
+    if (name === 'review') renderReview();
+    if (name === 'profile') renderProfile();
+  }
+  $('tabs').addEventListener('click', (ev) => { const b = ev.target.closest('.tab'); if (b) showView(b.dataset.view); });
+
+  // ---- themes ----
+  function activateTheme(id) {
+    if (!P.themes[id]) return;
+    ctl?.abort(); lastAction = null;
+    P.activeThemeId = id; touch(id);
+    $('topicInput').value = P.themes[id].topic === SAMPLE_TOPIC && P.themes[id].deck.every(c => c.sample) ? '' : P.themes[id].topic;
+    renderDeck(true); renderPanel(); renderHeader();
+  }
+  function startTopic(topic) {
+    topic = topic.trim(); if (!topic) return;
+    const existing = Object.values(P.themes).find(t => normTopic(t.topic) === normTopic(topic));
+    interacted = true;
+    if (existing) { activateTheme(existing.id); showView('swipe'); if (existing.deck.length <= 4) fetchMore(6); return; }
+    ctl?.abort(); lastAction = null;
+    const t = newTheme(topic); P.themes[t.id] = t; P.activeThemeId = t.id;
+    $('topicInput').value = topic;
+    touch(t.id); showView('swipe'); renderDeck(); renderPanel(); renderHeader();
+    if (!backend || aiDead) { setStatus('L’IA n’est pas disponible dans cette vue.', 'err'); return; }
+    if (backend.kind === 'api' && !apiKey) { openSettings(); return; }
+    fetchMore(6);
+  }
+  function deleteTheme(id) {
+    const t = P.themes[id]; if (!t) return;
+    delete P.themes[id]; store.deleted.add(id);
+    if (P.activeThemeId === id) {
+      const rest = Object.values(P.themes).sort((a, b) => b.lastAt - a.lastAt);
+      if (rest.length) P.activeThemeId = rest[0].id;
+      else { const s = newTheme(SAMPLE_TOPIC, SAMPLE_CARDS.map(c => ({ ...c }))); P.themes[s.id] = s; P.activeThemeId = s.id; store.dirty.add(s.id); }
+      lastAction = null; renderDeck(); renderPanel();
+    }
+    touch(); renderThemes(); renderHeader(); toast('Thème supprimé');
+  }
+  function renderThemes() {
+    const grid = $('themeGrid'); grid.textContent = '';
+    const list = Object.values(P.themes).sort((a, b) => b.lastAt - a.lastAt);
+    for (const t of list) {
+      const card = el('div', 'tcard' + (t.id === P.activeThemeId ? ' active' : ''));
+      card.style.setProperty('--h', hue(t.topic));
+      card.append(el('div', 'tband'));
+      const body = el('div', 'tbody');
+      body.append(el('h3', null, t.topic));
+      const due = t.liked.filter(c => (c.due || 0) <= now()).length;
+      const meta = el('div', 'tmeta');
+      meta.innerHTML = `<span><b>${t.nLikes}</b> aimées</span><span><b>${t.deck.length}</b> à venir</span>` + (due ? `<span><b>${due}</b> à réviser</span>` : '') + `<span>${fmtAgo(t.lastAt)}</span>`;
+      body.append(meta);
+      const top = Object.entries(t.weights).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 4);
+      if (top.length) { const tg = el('div', 'ttags'); for (const [k] of top) tg.append(el('span', 'tag', k)); body.append(tg); }
+      const row = el('div', 'trow');
+      const go = el('button', 'cta', t.id === P.activeThemeId ? 'Continuer' : 'Reprendre'); go.type = 'button';
+      go.onclick = () => { activateTheme(t.id); showView('swipe'); interacted = true; maybePrefetch(); };
+      const del = el('button', 'ghost danger', 'Supprimer'); del.type = 'button';
+      del.onclick = () => { if (del.dataset.arm) deleteTheme(t.id); else { del.dataset.arm = '1'; del.textContent = 'Confirmer ?'; setTimeout(() => { del.dataset.arm = ''; del.textContent = 'Supprimer'; }, 2500); } };
+      row.append(go, del); body.append(row);
+      card.append(body); grid.append(card);
+    }
+    const sl = $('sugList');
+    if (!sl.childElementCount) sl.append(el('p', 'none', aiReady() ? 'Clique sur « Surprends-moi » pour des idées adaptées à ton profil.' : 'Les suggestions demandent l’IA.'));
+    $('surpriseBtn').disabled = !aiReady();
+  }
+  $('newThemeBtn').onclick = () => { showView('swipe'); $('topicInput').focus(); };
+  $('surpriseBtn').onclick = async () => {
+    if (!aiReady()) return;
+    const btn = $('surpriseBtn'); btn.disabled = true; btn.textContent = 'Claude cherche…';
+    const sl = $('sugList'); sl.textContent = '';
+    const sink = makeLineSink((o) => {
+      if (!o || typeof o.topic !== 'string') return;
+      const row = el('div', 'sug'); const txt = el('div'); txt.append(el('b', null, o.topic)); if (o.why) txt.append(el('span', null, o.why));
+      const b = el('button', 'cta', 'Explorer'); b.type = 'button'; b.onclick = () => startTopic(o.topic);
+      row.append(txt, b); sl.append(row);
+    });
+    try {
+      await backend.generate(SYSTEM_SUGGEST, globalProfileText() + '\n\nThèmes déjà explorés (à ne pas reprendre) : ' + Object.values(P.themes).map(t => `« ${t.topic} »`).join(', '), { onDelta: (d) => sink.push(d), tier: 'default' });
+      sink.flush();
+      if (!sl.childElementCount) sl.append(el('p', 'none', 'Pas de suggestion cette fois. Réessaie.'));
+    } catch (e) { sink.flush(); sl.append(el('p', 'none', ERR[e && e.code] || ERR.upstream_error)); }
+    btn.disabled = false; btn.textContent = 'Surprends-moi';
+  };
+
+  // ---- review ----
+  let reviewScope = 'due', reviewQueue = [], reviewIdx = 0, revealed = false;
+  $('reviewScope').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button'); if (!b) return;
+    reviewScope = b.dataset.scope;
+    for (const x of $('reviewScope').querySelectorAll('button')) x.classList.toggle('on', x === b);
+    buildReviewQueue(); renderReview();
+  });
+  function buildReviewQueue() {
+    const all = [];
+    for (const t of Object.values(P.themes)) for (const c of t.liked) all.push({ t, c });
+    reviewQueue = reviewScope === 'due' ? all.filter(x => (x.c.due || 0) <= now()) : all;
+    reviewQueue.sort((a, b) => (a.c.box || 0) - (b.c.box || 0) || (a.c.due || 0) - (b.c.due || 0));
+    reviewIdx = 0; revealed = false;
+  }
+  function renderReview() {
+    if (!reviewQueue.length || reviewIdx >= reviewQueue.length) buildReviewQueue();
+    const wrap = $('reviewWrap'); wrap.textContent = '';
+    const total = reviewQueue.length;
+    $('reviewSub').textContent = total ? `${total - reviewIdx} carte${total - reviewIdx > 1 ? 's' : ''} ${reviewScope === 'due' ? 'à réviser' : 'au total'}. Intervalles : 1, 3, 7 puis 21 jours.` : 'Les cartes que tu as aimées reviennent à intervalles croissants : 1, 3, 7 puis 21 jours.';
+    if (!total || reviewIdx >= total) {
+      const e = el('div', 'empty'); e.style.position = 'static'; e.style.width = 'min(100%, 410px)'; e.style.minHeight = '300px';
+      const anyLiked = Object.values(P.themes).some(t => t.liked.length);
+      e.append(el('strong', null, anyLiked ? 'Tout est à jour' : 'Rien à réviser'), el('p', null, anyLiked ? 'Reviens demain, ou choisis « Tout revoir » pour repasser toutes tes cartes.' : 'Aime des cartes en swipant : elles reviendront ici pour être mémorisées.'));
+      const b = el('button', 'cta', 'Aller swiper'); b.type = 'button'; b.onclick = () => showView('swipe'); e.append(b);
+      wrap.append(e); return;
+    }
+    const { t, c } = reviewQueue[reviewIdx];
+    const f = el('div', 'flip'); f.style.setProperty('--h', hue(c.tags[0] || c.title));
+    const top = el('div', 'cardTop');
+    const eb = el('div', 'eyebrow'); eb.append(KINDS[c.kind] || 'Info');
+    const boxes = el('span', 'boxes'); for (let i = 0; i < 4; i++) { const b = el('i'); if (i < (c.box || 0)) b.classList.add('on'); boxes.append(b); } eb.append(boxes);
+    const tr = el('div', 'titleRow'); tr.append(el('h2', null, c.title));
+    const lang = langOf(t.topic);
+    if (lang && c.kind === 'mot' && 'speechSynthesis' in window) { const sp = el('button', 'speak'); sp.type = 'button'; sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; sp.onclick = (ev) => { ev.stopPropagation(); speak(c.title, lang); }; tr.append(sp); }
+    top.append(eb, tr);
+    const bottom = el('div', 'cardBottom');
+    bottom.append(el('div', 'where', t.topic));
+    if (revealed) { bottom.append(el('p', null, c.body)); if (c.extra) bottom.append(el('p', 'extra', c.extra)); if (c.deep) bottom.append(el('div', 'deep', c.deep)); }
+    else bottom.append(el('p', 'reveal', 'Tu t’en souviens ? Touche la carte pour voir la réponse.'));
+    f.append(top, bottom);
+    f.onclick = () => { revealed = true; renderReview(); };
+    wrap.append(f);
+    const acts = el('div', 'reviewActions');
+    if (!revealed) { const b = el('button', 'ghost', 'Voir la réponse'); b.type = 'button'; b.onclick = () => { revealed = true; renderReview(); }; acts.append(b); }
+    else {
+      const ko = el('button', 'rbtn ko', 'À revoir'); ko.type = 'button'; ko.onclick = () => gradeReview(false);
+      const ok = el('button', 'rbtn ok', 'Je savais'); ok.type = 'button'; ok.onclick = () => gradeReview(true);
+      acts.append(ko, ok);
+    }
+    wrap.append(acts);
+  }
+  function gradeReview(ok) {
+    const { t, c } = reviewQueue[reviewIdx];
+    c.box = ok ? Math.min(3, (c.box || 0) + 1) : 0;
+    c.due = now() + INTERVALS[c.box] * DAY;
+    c.reviews = (c.reviews || 0) + 1; if (ok) c.oks = (c.oks || 0) + 1;
+    P.stats.reviews++;
+    touch(t.id);
+    reviewIdx++; revealed = false;
+    renderReview(); renderHeader();
+    if (reviewIdx >= reviewQueue.length && reviewScope === 'due') toast('Session terminée, bien joué');
+  }
+
+  // ---- profile ----
+  function renderProfile() {
+    const s = P.stats;
+    const hero = $('heroStats'); hero.textContent = '';
+    const alive = s.lastDay === dayKey() || s.lastDay === dayKey(now() - DAY);
+    const items = [[alive ? s.streak : 0, 'jours de suite', ''], [s.best, 'record', ''], [s.swipes, 'swipes', ''], [s.likes, 'cartes aimées', 'like'], [dueCards().length, 'à réviser', 'ok'], [Object.keys(P.themes).length, 'thèmes', '']];
+    for (const [v, l, cls] of items) { const d = el('div', 'stat ' + cls); d.append(el('b', null, v), el('span', null, l)); hero.append(d); }
+    const week = $('week'); week.textContent = '';
+    const goal = P.settings.dailyGoal || 20;
+    for (let i = 6; i >= 0; i--) {
+      const k = dayKey(now() - i * DAY); const d = s.days[k] || { swipes: 0 };
+      const cell = el('div', 'day' + (i === 0 ? ' today' : ''));
+      const bar = el('i'); const fill = el('b'); fill.style.height = Math.min(100, d.swipes / goal * 100) + '%'; bar.append(fill);
+      cell.append(bar, el('span', null, ['D', 'L', 'M', 'M', 'J', 'V', 'S'][new Date(now() - i * DAY).getDay()]));
+      cell.title = `${k} : ${d.swipes} swipes`; week.append(cell);
+    }
+    $('goalInput').value = goal;
+    for (const b of $('levelSeg').querySelectorAll('button')) b.classList.toggle('on', b.dataset.level === P.settings.level);
+    renderBars($('kindList'), Object.entries(P.kinds), 'Aime des cartes pour voir tes préférences.', (k) => KINDS[k] || k);
+    renderBars($('interestList'), Object.entries(P.interests), 'Swipe quelques cartes pour dessiner tes centres d’intérêt.');
+    setSyncPill();
+  }
+  $('goalInput').addEventListener('change', () => { const v = Math.max(5, Math.min(200, parseInt($('goalInput').value, 10) || 20)); P.settings.dailyGoal = v; $('goalInput').value = v; touch(); renderHeader(); });
+  $('levelSeg').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; P.settings.level = b.dataset.level; touch(); renderProfile(); toast('Niveau : ' + b.textContent); });
+  $('exportBtn').onclick = async () => {
+    const json = JSON.stringify(P);
+    try { await navigator.clipboard.writeText(json); toast('Profil copié dans le presse-papiers'); }
+    catch (e) { const ta = $('ioArea'); ta.hidden = false; ta.value = json; ta.select(); $('ioRow').hidden = true; toast('Sélectionne et copie le texte ci-dessous'); }
+  };
+  $('importBtn').onclick = () => { $('ioArea').hidden = false; $('ioArea').value = ''; $('ioRow').hidden = false; $('ioArea').focus(); };
+  $('importCancel').onclick = () => { $('ioArea').hidden = true; $('ioRow').hidden = true; };
+  $('importGo').onclick = () => {
+    try {
+      const s = JSON.parse($('ioArea').value);
+      if (!s || s.v !== 3 || !s.themes) throw new Error('format');
+      const deleted = Object.keys(P.themes);
+      P = { ...newProfile(), ...s }; P.updatedAt = now();
+      for (const id of deleted) if (!P.themes[id]) store.deleted.add(id);
+      for (const id of Object.keys(P.themes)) store.dirty.add(id);
+      if (!P.themes[P.activeThemeId]) P.activeThemeId = Object.keys(P.themes)[0];
+      touch(); renderAll(); $('ioArea').hidden = true; $('ioRow').hidden = true; toast('Profil importé');
+    } catch (e) { toast('Ce texte n’est pas un profil valide'); }
+  };
+  $('wipeBtn').onclick = () => {
+    const b = $('wipeBtn');
+    if (!b.dataset.arm) { b.dataset.arm = '1'; b.textContent = 'Confirmer la suppression ?'; setTimeout(() => { b.dataset.arm = ''; b.textContent = 'Tout effacer'; }, 3000); return; }
+    for (const id of Object.keys(P.themes)) store.deleted.add(id);
+    P = newProfile(); const t = newTheme(SAMPLE_TOPIC, SAMPLE_CARDS.map(c => ({ ...c }))); P.themes[t.id] = t; P.activeThemeId = t.id;
+    lastAction = null; interacted = false; $('topicInput').value = '';
+    touch(t.id); renderAll(); b.dataset.arm = ''; b.textContent = 'Tout effacer'; toast('Profil effacé');
+  };
+
+  // ---- settings modal ----
+  function openSettings(msg) {
+    $('keyInput').value = apiKey || '';
+    $('modelSelect').value = P.settings.model || 'claude-opus-5';
+    const err = $('modalErr'); err.hidden = !msg; err.textContent = msg || '';
+    $('modal').hidden = false; setTimeout(() => $('keyInput').focus(), 0);
+  }
+  const closeSettings = () => { $('modal').hidden = true; };
   $('settingsForm').addEventListener('submit', (ev) => {
     ev.preventDefault();
-    settings.key = $('keyInput').value.trim();
-    settings.model = $('modelSelect').value;
-    saveSettings(); closeSettings(); setStatus('');
+    apiKey = $('keyInput').value.trim(); try { localStorage.setItem(KKEY, apiKey); } catch (e) {}
+    P.settings.model = $('modelSelect').value; touch();
+    closeSettings(); setStatus(''); $('settingsLabel').textContent = apiKey ? 'Réglages IA' : 'Clé API';
     renderDeck();
-    if (settings.key && state.topic !== SAMPLE_TOPIC && state.deck.length <= 4) { interacted = true; fetchMore(6); }
+    const t = cur(); if (apiKey && t && !t.deck.every(c => c.sample) && t.deck.length <= 4) { interacted = true; fetchMore(6); }
   });
   $('modalCancel').onclick = closeSettings;
   $('modal').addEventListener('click', (ev) => { if (ev.target === $('modal')) closeSettings(); });
   $('settingsBtn').onclick = () => openSettings();
 
-  // ---------- topic ----------
-  function startTopic(topic) {
-    topic = topic.trim(); if (!topic) return;
-    ctl?.abort();
-    interacted = true; lastAction = null;
-    state = freshState(topic);
-    $('topicInput').value = topic;
-    $('panel').classList.remove('open');
-    save(); renderDeck(); renderPanel();
-    if (!backend || aiDead) { setStatus('L’IA n’est pas disponible dans cette vue.', 'err'); return; }
-    if (backend.kind === 'api' && !settings.key) { openSettings(); return; }
-    fetchMore(6);
-  }
-
+  // ================= wiring =================
   $('topicForm').addEventListener('submit', (ev) => { ev.preventDefault(); startTopic($('topicInput').value); });
-  const sug = $('suggest');
-  for (const s of SUGGESTIONS) {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = s;
-    b.onclick = () => startTopic(s); sug.append(b);
-  }
+  for (const s of SUGGESTIONS) { const b = el('button', 'chip', s); b.type = 'button'; b.onclick = () => startTopic(s); $('suggest').append(b); }
   $('likeBtn').onclick = () => swipeTop('like');
   $('skipBtn').onclick = () => swipeTop('skip');
   $('undoBtn').onclick = undo;
-  $('resetBtn').onclick = () => {
-    ctl?.abort(); lastAction = null; interacted = false;
-    state = freshState(SAMPLE_TOPIC, SAMPLE_CARDS.map(c => ({ ...c })));
-    $('topicInput').value = '';
-    try { localStorage.removeItem(KEY); } catch (e) {}
-    save(); renderDeck(true); renderPanel(); setStatus('');
-    $('panel').classList.remove('open');
-  };
   $('panelBtn').onclick = () => $('panel').classList.toggle('open');
   $('closeBtn').onclick = () => $('panel').classList.remove('open');
   document.addEventListener('keydown', (ev) => {
     if (!$('modal').hidden) { if (ev.key === 'Escape') closeSettings(); return; }
-    if (ev.target && (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'SELECT')) return;
-    if (ev.key === 'ArrowRight') { ev.preventDefault(); swipeTop('like'); }
-    else if (ev.key === 'ArrowLeft') { ev.preventDefault(); swipeTop('skip'); }
-    else if (ev.key === 'Backspace') { ev.preventDefault(); undo(); }
+    if (ev.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(ev.target.tagName)) return;
+    if (currentView === 'swipe') {
+      if (ev.key === 'ArrowRight') { ev.preventDefault(); swipeTop('like'); }
+      else if (ev.key === 'ArrowLeft') { ev.preventDefault(); swipeTop('skip'); }
+      else if (ev.key === 'Backspace') { ev.preventDefault(); undo(); }
+    } else if (currentView === 'review' && reviewQueue.length && reviewIdx < reviewQueue.length) {
+      if (ev.key === ' ' || ev.key === 'Enter') { ev.preventDefault(); revealed = true; renderReview(); }
+      else if (revealed && ev.key === 'ArrowRight') { ev.preventDefault(); gradeReview(true); }
+      else if (revealed && ev.key === 'ArrowLeft') { ev.preventDefault(); gradeReview(false); }
+    }
   });
+  function renderAll() { renderDeck(); renderPanel(); renderHeader(); if (currentView !== 'swipe') showView(currentView); const t = cur(); if (t) $('topicInput').value = t.deck.every(c => c.sample) && !t.liked.length ? '' : t.topic; }
 
-  // ---------- boot ----------
+  // ================= boot =================
   function start(hot) {
-    load(hot);
-    if (state.topic !== SAMPLE_TOPIC || state.liked.length || state.skipped.length) $('topicInput').value = state.topic;
-    renderDeck(); renderPanel();
+    loadLocal(hot);
+    renderAll();
     (async () => {
       backend = await detectBackend();
-      if (!backend) {
-        setStatus('L’IA n’est pas disponible dans cette vue : tu peux swiper le jeu d’exemple.', 'err');
-        $('goBtn').disabled = true;
-      } else if (backend.kind === 'api') {
-        $('settingsBtn').hidden = false;
-        $('settingsLabel').textContent = settings.key ? 'Réglages IA' : 'Clé API';
-      }
+      if (!backend) { setStatus('L’IA n’est pas disponible dans cette vue : tu peux swiper le jeu d’exemple.', 'err'); $('goBtn').disabled = true; }
+      else if (backend.kind === 'api') { $('settingsBtn').hidden = false; $('settingsLabel').textContent = apiKey ? 'Réglages IA' : 'Clé API'; }
       renderDeck();
     })();
+    initDb();
   }
   window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? null);
 })();

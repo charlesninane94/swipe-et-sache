@@ -6,10 +6,15 @@ Page : https://charlesninane94.github.io/swipe-et-sache/
 
 ## Fonctionnement
 
+- Profil utilisateur global : série de jours, objectif quotidien, centres d'intérêt et types de cartes préférés agrégés sur tous les thèmes, niveau (débutant / intermédiaire / expert). Il est renvoyé à Claude pour personnaliser chaque nouveau thème dès la première carte.
+- Bibliothèque de thèmes : chaque thème garde sa pile, ses cartes aimées et ses poids ; on reprend où on s'était arrêté.
+- Révision par répétition espacée des cartes aimées (boîtes de Leitner : 1, 3, 7 puis 21 jours).
+- « Approfondir » sur une carte, prononciation audio pour les mots de langue, suggestions de thèmes par Claude, export / import du profil.
+
 - Une seule page HTML, sans build ni dépendance.
 - Les cartes sont générées en flux par l'API Anthropic (une ligne JSON par carte) : la première carte s'affiche dès qu'elle est écrite.
 - Chaque carte porte 2 ou 3 sous-thèmes. Un « j'aime » leur ajoute 2 points, un « passe » en retire 1. Le profil est renvoyé à Claude à chaque lot : 70 % de cartes dans tes goûts, 30 % d'exploration.
-- Le profil, la pile de cartes et la clé API restent dans le navigateur (localStorage).
+- Sur GitHub Pages, le profil et la clé API restent dans le navigateur (localStorage). Dans la version claude.ai, le profil est aussi enregistré dans la base de l'artefact, privée par utilisateur.
 
 ## Clé API
 
