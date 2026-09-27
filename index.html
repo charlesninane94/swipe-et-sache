@@ -873,7 +873,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
       const card = acceptCard(th, raw); if (!card) return;
       const wasVisible = th.deck.length;
       th.deck.push(card); got++;
-      if (P.activeThemeId === themeId) { if (wasVisible < 3) renderDeck(true); else $('nDeck').textContent = th.deck.length; }
+      if (P.activeThemeId === themeId) { if (wasVisible === 0) renderDeck(true); else if (wasVisible < 3) addBackCard(card, wasVisible, th); else syncDeckMeta(); }
     });
     try {
       await backend.generate(SYSTEM, buildUser(n), { onDelta: (d) => sink.push(d), signal: ctl.signal, tier: NEWS_RE.test(t.topic) ? 'default' : 'quick' });
@@ -890,7 +890,8 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
       if (got) touch(themeId);
     } finally {
       loading = false; ctl = null;
-      renderDeck(); renderPanel();
+      if (deckEl.querySelector('.card') && P.activeThemeId === themeId) syncDeckMeta(); else renderDeck();
+      renderPanel();
     }
   }
   function maybePrefetch() { const t = cur(); if (interacted && t && aiReady() && !loading && t.deck.length <= 4) fetchMore(6); }
@@ -953,6 +954,19 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     } catch (e) {
       box.textContent = text || 'Impossible d’approfondir pour le moment.'; btn.disabled = false; btn.textContent = 'Réessayer';
     }
+  }
+  function syncDeckMeta() {
+    const t = cur();
+    $('nDeck').textContent = t ? t.deck.length : 0;
+    $('undoBtn').disabled = !lastAction;
+    $('skipBtn').disabled = $('likeBtn').disabled = !(t && t.deck.length);
+  }
+  function addBackCard(card, i, t) {
+    if (dragging || flying) { pendingRender = true; return; }
+    const stack = deckEl.querySelectorAll('.card');
+    if (!stack.length || stack.length !== i) { renderDeck(); return; }
+    deckEl.prepend(makeCard(card, i, t));
+    syncDeckMeta();
   }
   function renderDeck(animate) {
     if (dragging || flying) { pendingRender = true; return; }
