@@ -1,15 +1,15 @@
 # Swipe & Sache
 
-Le tinder de l'info. Tu donnes un thème (« apprends-moi des mots en espagnol », « les nouvelles du sport »…), Claude génère des cartes courtes, tu swipes à droite ce qui t'intéresse, et chaque « j'aime » renforce ce genre d'info dans les cartes suivantes.
+Un outil d'apprentissage par cartes à swiper. Tu donnes un thème (« apprends-moi des mots en espagnol », « histoire de France »…), Claude génère des cartes courtes, et pour chacune tu réponds « je savais » (droite) ou « je ne savais pas » (gauche). Ce que tu savais ne revient jamais. Ce que tu ne savais pas revient plus tard, à intervalles croissants, jusqu'à être acquis. Ton profil montre tes forces et tes lacunes par sous-thème.
 
 Page : https://charlesninane94.github.io/swipe-et-sache/
 
 ## Fonctionnement
 
-- Profil utilisateur global : série de jours, objectif quotidien, centres d'intérêt et types de cartes préférés agrégés sur tous les thèmes, niveau (débutant / intermédiaire / expert). Il est renvoyé à Claude pour personnaliser chaque nouveau thème dès la première carte.
-- Bibliothèque de thèmes : chaque thème garde sa pile, ses cartes aimées et ses poids ; on reprend où on s'était arrêté.
-- Révision par répétition espacée des cartes aimées (boîtes de Leitner : 1, 3, 7 puis 21 jours).
-- « Approfondir » sur une carte, prononciation audio pour les mots de langue, suggestions de thèmes par Claude, export / import du profil.
+- Modèle de connaissance : chaque carte porte 2 ou 3 sous-thèmes (tags). Un « je savais » / « je ne savais pas » alimente un taux de connaissance par sous-thème, par thème et global. Le profil affiche les points forts et ce qui reste à travailler.
+- File d'apprentissage : une carte non sue revient dans la pile après 20 minutes, puis 1 jour, puis 4 jours. Trois « je savais » d'affilée la rendent acquise ; elle ne revient plus. Un échec la remet au début.
+- Claude reçoit forces et lacunes : il consolide les sous-thèmes faibles par des notions voisines, monte en finesse sur les sous-thèmes maîtrisés, et explore le reste.
+- Marque-page indépendant pour sauvegarder une carte, « Approfondir », prononciation audio pour les mots de langue, suggestions de thèmes, niveau par thème, série de jours et objectif quotidien, export / import.
 
 - Une seule page HTML, sans build ni dépendance.
 - Les cartes sont générées en flux par l'API Anthropic (une ligne JSON par carte) : la première carte s'affiche dès qu'elle est écrite.
