@@ -308,6 +308,7 @@
   .seg { display: inline-flex; gap: 4px; background: var(--chip); border-radius: 999px; padding: 3px; align-self: flex-start; flex-wrap: wrap; }
   .seg button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; font-size: .82rem; font-weight: 600; color: var(--muted); }
   .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-soft); }
+  .seg.small button { padding: 4px 10px; font-size: .76rem; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .row input[type=number] { width: 80px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 6px 10px; }
   .syncPill { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--muted); }
@@ -441,6 +442,14 @@
       <aside class="panel" id="panel">
         <button class="closeBtn" id="closeBtn" type="button">Fermer</button>
         <div><h3 id="panelTopic">Thème</h3><p class="sub" id="panelSub"></p></div>
+        <div>
+          <p class="sub" style="margin:0 0 6px;font-weight:600;color:var(--ink)">Niveau des cartes</p>
+          <div class="seg small" id="panelLevel">
+            <button type="button" data-level="debutant">Débutant</button>
+            <button type="button" data-level="intermediaire">Intermédiaire</button>
+            <button type="button" data-level="expert">Expert</button>
+          </div>
+        </div>
         <div class="stats">
           <div class="stat like"><b id="nLike">0</b><span>aimées</span></div>
           <div class="stat"><b id="nSkip">0</b><span>passées</span></div>
@@ -498,7 +507,7 @@
         <div class="row"><label for="goalInput" style="font-size:.85rem;font-weight:600">Objectif / jour</label><input id="goalInput" type="number" min="5" max="200" step="5"></div>
       </div>
       <div class="box">
-        <div><h3>Niveau</h3><p class="sub">Influence la difficulté et la finesse des cartes générées.</p></div>
+        <div><h3>Niveau par défaut</h3><p class="sub">Appliqué aux nouveaux thèmes. Chaque thème garde ensuite son propre niveau, réglable depuis le panneau du thème.</p></div>
         <div class="seg" id="levelSeg">
           <button type="button" data-level="debutant">Débutant</button>
           <button type="button" data-level="intermediaire">Intermédiaire</button>
@@ -573,7 +582,9 @@
   const normTopic = (t) => String(t).toLowerCase().trim().replace(/\s+/g, ' ');
   const norm = (t) => String(t).toLowerCase().trim().replace(/\s+/g, ' ').slice(0, 24);
 
-  const newTheme = (topic, deck) => ({ id: 't' + uid8(), topic, createdAt: now(), lastAt: now(), deck: deck || [], seen: [], liked: [], skipped: [], weights: {}, vocab: [], nLikes: 0, nSkips: 0 });
+  const newTheme = (topic, deck) => ({ id: 't' + uid8(), topic, level: P.settings.level, createdAt: now(), lastAt: now(), deck: deck || [], seen: [], liked: [], skipped: [], weights: {}, vocab: [], nLikes: 0, nSkips: 0 });
+  const LEVEL_LABEL = { debutant: 'Débutant', intermediaire: 'Intermédiaire', expert: 'Expert' };
+  const levelOf = (t) => (t && t.level) || P.settings.level || 'intermediaire';
   const newProfile = () => ({
     v: 3, createdAt: now(), updatedAt: now(),
     settings: { model: 'claude-opus-5', level: 'intermediaire', dailyGoal: 20 },
@@ -729,12 +740,12 @@ Règles :
 Format de sortie, strict : une carte par ligne, chaque ligne est un objet JSON complet et compact, sans tableau englobant, sans texte avant ou après, sans code fence. Écris la première ligne immédiatement.
 Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una mariposa se posó en la flor.","tags":["animaux","nom"],"kind":"mot"}`;
 
-  function globalProfileText() {
+  function globalProfileText(level) {
     const ints = Object.entries(P.interests).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => `${k} (+${v})`).join(', ') || 'rien encore';
     const kinds = Object.entries(P.kinds).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${KINDS[k] || k} (${v})`).join(', ') || 'rien encore';
     const themes = Object.values(P.themes).map(t => t.topic).slice(0, 8).join(' ; ') || 'aucun';
     return `Profil général (tous thèmes confondus) :
-- Niveau visé : ${LEVELS[P.settings.level] || LEVELS.intermediaire}
+- Niveau visé : ${LEVELS[level || P.settings.level] || LEVELS.intermediaire}
 - Centres d'intérêt récurrents : ${ints}
 - Types de cartes préférés : ${kinds}
 - Thèmes déjà explorés : ${themes}`;
@@ -748,7 +759,7 @@ Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una 
     const seen = t.seen.concat(t.deck.map(c => c.title)).slice(-70).map(x => `« ${x} »`).join(', ') || 'aucun';
     return `Thème demandé : « ${t.topic} »
 
-${globalProfileText()}
+${globalProfileText(levelOf(t))}
 
 Profil pour ce thème :
 - Sous-thèmes aimés (poids) : ${fmt(liked)}
@@ -1055,6 +1066,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const isSample = t.deck.every(c => c.sample) && !t.liked.length && !t.skipped.length;
     $('panelSub').textContent = isSample ? 'Jeu d’exemple. Lance un thème pour que Claude génère la suite.' : 'Cartes générées par Claude à partir de tes swipes et de ton profil.';
     $('nLike').textContent = t.nLikes; $('nSkip').textContent = t.nSkips; $('nDeck').textContent = t.deck.length;
+    for (const b of $('panelLevel').querySelectorAll('button')) b.classList.toggle('on', b.dataset.level === levelOf(t));
     renderBars($('wlist'), Object.entries(t.weights), 'Swipe quelques cartes pour dessiner ton profil sur ce thème.');
     const ll = $('likedList'); ll.textContent = '';
     if (!t.liked.length) ll.append(el('p', 'none', 'Aucune carte gardée pour l’instant.'));
@@ -1155,7 +1167,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
       body.append(el('h3', null, t.topic));
       const due = t.liked.filter(c => (c.due || 0) <= now()).length;
       const meta = el('div', 'tmeta');
-      meta.innerHTML = `<span><b>${t.nLikes}</b> aimées</span><span><b>${t.deck.length}</b> à venir</span>` + (due ? `<span><b>${due}</b> à réviser</span>` : '') + `<span>${fmtAgo(t.lastAt)}</span>`;
+      meta.innerHTML = `<span>${LEVEL_LABEL[levelOf(t)]}</span><span><b>${t.nLikes}</b> aimées</span><span><b>${t.deck.length}</b> à venir</span>` + (due ? `<span><b>${due}</b> à réviser</span>` : '') + `<span>${fmtAgo(t.lastAt)}</span>`;
       body.append(meta);
       const top = Object.entries(t.weights).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 4);
       if (top.length) { const tg = el('div', 'ttags'); for (const [k] of top) tg.append(el('span', 'tag', k)); body.append(tg); }
@@ -1325,6 +1337,18 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
   $('modalCancel').onclick = closeSettings;
   $('modal').addEventListener('click', (ev) => { if (ev.target === $('modal')) closeSettings(); });
   $('settingsBtn').onclick = () => openSettings();
+
+  $('panelLevel').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button'); const t = cur(); if (!b || !t || b.dataset.level === levelOf(t)) return;
+    t.level = b.dataset.level;
+    if (aiReady() && !t.deck.every(c => c.sample)) {
+      ctl?.abort(); lastAction = null;
+      t.deck = t.deck.filter(c => c.sample);
+      touch(t.id); renderDeck(); renderPanel();
+      interacted = true; fetchMore(6);
+      toast('Niveau ' + LEVEL_LABEL[t.level].toLowerCase() + ' : nouvelles cartes en route');
+    } else { touch(t.id); renderPanel(); toast('Niveau ' + LEVEL_LABEL[t.level].toLowerCase()); }
+  });
 
   // ================= wiring =================
   $('topicForm').addEventListener('submit', (ev) => { ev.preventDefault(); startTopic($('topicInput').value); });
