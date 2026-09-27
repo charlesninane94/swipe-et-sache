@@ -211,6 +211,12 @@
     position: absolute; top: 22px; font-family: var(--display); font-weight: 800; font-size: 1.5rem; letter-spacing: .06em;
     padding: 4px 14px; border: 3px solid; border-radius: 10px; opacity: 0; pointer-events: none; background: var(--surface);
   }
+  .modeSeg { display: flex; justify-content: center; }
+  .quizGate { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; flex: 1; text-align: center; color: var(--muted); font-size: .9rem; padding: 6px 0; }
+  .quizGate .cta { padding: 9px 20px; }
+  .answerLbl { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; color: var(--ok); margin: 0; }
+  .proposal { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+  .domainHead { grid-column: 1 / -1; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; color: var(--muted); margin-top: 6px; }
   .stamp.know { right: 20px; color: var(--ok); border-color: var(--ok); transform: rotate(12deg); }
   .stamp.dont { left: 20px; color: var(--warn); border-color: var(--warn); transform: rotate(-12deg); }
   .save {
@@ -460,6 +466,12 @@
     <div class="chips" id="suggest"></div>
     <div class="stage">
       <div class="deckWrap">
+        <div class="modeSeg">
+          <div class="seg small" id="modeSeg">
+            <button type="button" data-mode="learn" class="on">Apprendre</button>
+            <button type="button" data-mode="quiz">Question</button>
+          </div>
+        </div>
         <div class="status" id="status"></div>
         <div class="deck" id="deck"></div>
         <div class="actions">
@@ -552,7 +564,9 @@
     <div class="pgrid">
       <div class="box wide"><div class="hero" id="heroStats"></div></div>
       <div class="box">
-        <div><h3>Maîtrise par thème</h3><p class="sub">Part des cartes que tu savais ou que tu as acquises.</p></div>
+        <div><h3>Maîtrise par domaine</h3><p class="sub">Part des cartes que tu savais ou que tu as acquises.</p></div>
+        <div class="wlist" id="domainMastery"></div>
+        <div><h3>Par thème</h3></div>
         <div class="wlist" id="themeMastery"></div>
       </div>
       <div class="box">
@@ -615,10 +629,16 @@
   const ACQUIRED_AT = 3;                                // succès consécutifs nécessaires
   const SAMPLE_TOPIC = 'Apprends-moi des mots en espagnol';
   const SUGGESTIONS = ['Apprends-moi des mots en espagnol', 'Histoire de France en anecdotes', 'Science du quotidien', 'Vocabulaire japonais pour voyager', 'Géographie du monde', 'Astronomie', 'Économie expliquée simplement', 'Grandes dates du XXe siècle'];
-  const KINDS = { mot: 'Mot', fait: 'Le savais-tu ?', actu: 'Actu', conseil: 'Astuce', citation: 'Citation', info: 'Info' };
+  const KINDS = { mot: 'Mot', fait: 'Le savais-tu ?', actu: 'Actu', conseil: 'Astuce', citation: 'Citation', info: 'Info', question: 'Question' };
   const LEVELS = { debutant: 'débutant : notions de base, explications très simples, exemples concrets', intermediaire: 'intermédiaire : au-delà des évidences, nuances utiles', expert: 'expert : cas pointus, vocabulaire rare, détails que seuls les connaisseurs savent' };
   const LEVEL_LABEL = { debutant: 'Débutant', intermediaire: 'Intermédiaire', expert: 'Expert' };
   const NEWS_RE = /actu|nouvelle|news|résultat|classement|sport|politique|économie|bourse|match|championnat|élection|transfert|marché|tech|dernières|récent/i;
+  const DOMAINS = ['Langues', 'Histoire', 'Géographie', 'Sciences', 'Technologie', 'Santé', 'Sport', 'Arts et culture', 'Économie et société', 'Vie pratique', 'Autre'];
+  const STOP = new Set('apprends apprendre moi me des les le la de du un une en et ou sur pour avec dans par au aux ce cette ces mon ma mes ton ta tes son sa ses nos vos leurs que qui quoi tout tous toute toutes plus tres très bien mots mot vocabulaire vocab notions bases base cours lecon leçon expliquee expliqué explique simplement simple facile debutant débutant intermediaire intermédiaire expert niveau apprentissage apprenez apprend savoir connaitre connaître decouvrir découvrir infos info the and of'.split(' '));
+  const fold = (x) => String(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const tokens = (x) => fold(x).replace(/\d+$/, '').split(/[^a-z0-9]+/).filter(w => w.length > 2 && !STOP.has(w));
+  const jaccard = (a, b) => { if (!a.length || !b.length) return 0; const B = new Set(b); let n = 0; for (const w of new Set(a)) if (B.has(w)) n++; return n / (new Set([...a, ...b]).size); };
+  const keyOf = (k) => fold(k || '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48);
   const LANGS = [[/espagnol|spanish|español/i, 'es-ES'], [/japonais|japanese/i, 'ja-JP'], [/anglais|english/i, 'en-US'], [/allemand|german|deutsch/i, 'de-DE'], [/italien|italian/i, 'it-IT'], [/portugais|brésilien|portuguese/i, 'pt-PT'], [/néerlandais|dutch|flamand/i, 'nl-NL'], [/chinois|mandarin|chinese/i, 'zh-CN'], [/coréen|korean/i, 'ko-KR'], [/arabe|arabic/i, 'ar-SA'], [/russe|russian/i, 'ru-RU'], [/grec|greek/i, 'el-GR'], [/turc|turkish/i, 'tr-TR'], [/suédois|swedish/i, 'sv-SE'], [/polonais|polish/i, 'pl-PL']];
   const SAMPLE_CARDS = [
     { title: 'la mariposa', body: 'Le papillon.', extra: 'Una mariposa azul se posó en mi mano.', tags: ['animaux', 'nom', 'nature'], kind: 'mot', sample: true },
@@ -638,16 +658,22 @@
   const normTopic = (t) => String(t).toLowerCase().trim().replace(/\s+/g, ' ');
   const norm = (t) => String(t).toLowerCase().trim().replace(/\s+/g, ' ').slice(0, 24);
   const clone = (o) => (typeof structuredClone === 'function' ? structuredClone(o) : JSON.parse(JSON.stringify(o)));
-  const stripCard = (c) => ({ title: c.title, body: c.body, extra: c.extra || '', tags: c.tags || [], kind: c.kind || 'info', deep: c.deep || '' });
+  const stripCard = (c) => ({ title: c.title, body: c.body, extra: c.extra || '', tags: c.tags || [], kind: c.kind || 'info', deep: c.deep || '', key: c.key || '', quiz: !!c.quiz });
 
   const newProfile = () => ({
     v: 4, createdAt: now(), updatedAt: now(),
     settings: { model: 'claude-opus-5', level: 'intermediaire', dailyGoal: 20 },
     stats: { swipes: 0, known: 0, unknown: 0, acquired: 0, reviews: 0, days: {}, streak: 0, best: 0, lastDay: '' },
-    tagStats: {}, activeThemeId: null, themes: {},
+    tagStats: {}, index: { t: {}, k: {} }, activeThemeId: null, themes: {},
   });
   let P = newProfile();
-  const newTheme = (topic, deck) => ({ id: 't' + uid8(), topic, level: P.settings.level, createdAt: now(), lastAt: now(), deck: deck || [], seen: [], known: [], learning: [], acquired: [], saved: [], tagStats: {}, vocab: [], sinceReview: 3 });
+  const newTheme = (topic, deck) => ({ id: 't' + uid8(), topic, raw: topic, domain: '', mode: 'learn', level: P.settings.level, createdAt: now(), lastAt: now(), deck: deck || [], seen: [], known: [], learning: [], acquired: [], saved: [], tagStats: {}, vocab: [], sinceReview: 3 });
+  function indexAdd(title, key) {
+    const idx = P.index || (P.index = { t: {}, k: {} });
+    idx.t[fold(title).slice(0, 60)] = 1; if (key) idx.k[key] = 1;
+    for (const m of [idx.t, idx.k]) { const ks = Object.keys(m); if (ks.length > 3000) for (const k of ks.slice(0, ks.length - 3000)) delete m[k]; }
+  }
+  const indexHas = (title, key) => { const idx = P.index || { t: {}, k: {} }; return !!(idx.t[fold(title).slice(0, 60)] || (key && idx.k[key])); };
   const levelOf = (t) => (t && t.level) || P.settings.level || 'intermediaire';
   let apiKey = '';
   let backend = null, loading = false, ctl = null, lastAction = null, interacted = false, aiDead = false;
@@ -669,8 +695,8 @@
   }
   function hydrate(s) {
     const base = newProfile();
-    P = { ...base, ...s, settings: { ...base.settings, ...(s.settings || {}) }, stats: { ...base.stats, ...(s.stats || {}) }, tagStats: s.tagStats || {}, themes: s.themes || {} };
-    for (const t of Object.values(P.themes)) { for (const k of ['deck', 'seen', 'known', 'learning', 'acquired', 'saved', 'vocab']) if (!Array.isArray(t[k])) t[k] = []; if (!t.tagStats) t.tagStats = {}; if (t.sinceReview == null) t.sinceReview = 3; }
+    P = { ...base, ...s, settings: { ...base.settings, ...(s.settings || {}) }, stats: { ...base.stats, ...(s.stats || {}) }, tagStats: s.tagStats || {}, index: (s.index && s.index.t) ? s.index : { t: {}, k: {} }, themes: s.themes || {} };
+    for (const t of Object.values(P.themes)) { for (const k of ['deck', 'seen', 'known', 'learning', 'acquired', 'saved', 'vocab']) if (!Array.isArray(t[k])) t[k] = []; if (!t.tagStats) t.tagStats = {}; if (t.sinceReview == null) t.sinceReview = 3; if (!t.mode) t.mode = 'learn'; if (!t.raw) t.raw = t.topic; if (t.domain == null) t.domain = ''; }
   }
   function loadLocal(hot) {
     try {
@@ -815,10 +841,11 @@ Règles :
 6. Si le thème touche à l'actualité : tu n'as pas accès à internet. Donne des faits datés que tu connais avec certitude et indique la période dans "extra". Ne fabrique jamais de résultat ni de chiffre.
 7. "kind" vaut l'une de ces valeurs : "mot", "fait", "actu", "conseil", "citation", "info".
 8. "tags" : 2 ou 3 mots-clés courts en minuscules décrivant le sous-thème (ex. "verbe", "faux-ami", "révolution", "planètes"). Réutilise les tags existants quand ils conviennent : ils servent à mesurer les forces et faiblesses.
-9. Ne répète jamais un titre déjà vu, ni une paraphrase : les cartes sues ne doivent jamais revenir.
+9. Ne répète jamais un fait déjà vu, même reformulé : les cartes sues ne doivent jamais revenir. Chaque carte porte une "key" : identifiant canonique du fait, 2 à 5 mots en minuscules sans accents séparés par des tirets (ex. "mariposa-papillon", "2024-annee-plus-chaude"). Deux formulations du même fait ont la même key ; n'émets jamais une key déjà listée.
 
 Format de sortie, strict : une carte par ligne, chaque ligne est un objet JSON complet et compact, sans tableau englobant, sans texte avant ou après, sans code fence. Écris la première ligne immédiatement.
-Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una mariposa se posó en la flor.","tags":["animaux","nom"],"kind":"mot"}`;
+Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una mariposa se posó en la flor.","tags":["animaux","nom"],"kind":"mot","key":"mariposa-papillon"}`;
+  const QUIZ_RULES = `MODE QUESTION : chaque carte est une question à laquelle l'utilisateur répond de tête avant de voir la réponse. "title" est la question (au plus 110 caractères, se termine par « ? », une seule réponse attendue, sans indice dans la question), "body" est la réponse courte et vérifiable (au plus 140 caractères, commence par la réponse elle-même), "extra" une précision utile (au plus 90). "kind" vaut "question". Pour une langue : question du type « Comment dit-on « papillon » en espagnol ? » ou « Que signifie « madrugar » ? ».`;
 
   const fmtTags = (rows) => rows.length ? rows.map(x => `${x.tag} (${x.k} su${x.k > 1 ? 's' : ''} / ${x.u} pas su${x.u > 1 ? 's' : ''})`).join(', ') : 'aucun pour l’instant';
   function globalProfileText(level) {
@@ -837,8 +864,11 @@ Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una 
     const rows = tagRows(t.tagStats, 1);
     const strong = rows.filter(x => x.r >= .6 && x.n >= 2).sort((a, b) => b.r - a.r).slice(0, 8);
     const weak = rows.filter(x => x.u >= 1 && x.r <= .5).sort((a, b) => a.r - b.r || b.u - a.u).slice(0, 8);
-    const seen = t.seen.concat(t.deck.map(c => c.title)).slice(-80).map(x => `« ${x} »`).join(', ') || 'aucun';
-    return `Thème demandé : « ${t.topic} »
+    const seen = t.seen.concat(t.deck.map(c => c.title)).slice(-50).map(x => `« ${x} »`).join(', ') || 'aucun';
+    const keys = [...t.known, ...t.learning, ...t.acquired].map(c => c.key).filter(Boolean).slice(-80).join(', ') || 'aucune';
+    const covered = Object.entries(t.tagStats).sort((a, b) => (b[1].k + b[1].u) - (a[1].k + a[1].u)).slice(0, 20).map(([k, v]) => `${k} (${v.k + v.u})`).join(', ') || 'aucun';
+    return `Thème demandé : « ${t.topic} »${t.domain ? ` (domaine : ${t.domain})` : ''}
+${t.mode === 'quiz' ? '\n' + QUIZ_RULES + '\n' : ''}
 
 ${globalProfileText(levelOf(t))}
 
@@ -848,10 +878,13 @@ Sur ce thème :
 - Dernières cartes qu'il ne savait pas : ${t.learning.slice(-10).map(c => `« ${c.title} »`).join(', ') || 'aucune'}
 - Dernières cartes qu'il savait : ${t.known.slice(-8).map(c => `« ${c.title} »`).join(', ') || 'aucune'}
 - Tags existants : ${t.vocab.slice(-30).join(', ') || 'aucun'}
-- Titres déjà vus, à ne jamais répéter : ${seen}
+- Sous-thèmes déjà couverts (nombre de cartes) : ${covered}
+- Keys déjà émises, à ne jamais réutiliser : ${keys}
+- Derniers titres vus, à ne pas reformuler : ${seen}
 
 Génère ${n} nouvelles cartes, une par ligne.`;
   }
+  const SYSTEM_CANON = `On te donne le thème tapé librement par un utilisateur d'une app d'apprentissage. Réponds avec une seule ligne JSON : {"title":"...","domain":"..."}. "title" : un titre de thème propre, court (au plus 40 caractères), sans verbe d'injonction ni « apprends-moi », qui garde la spécificité du thème (ex. « Vocabulaire espagnol », « Histoire de France », « Football : tactique »). "domain" : exactement l'un de ces libellés : ${DOMAINS.join(' | ')}. Rien d'autre.`;
   const SYSTEM_DEEP = `Tu approfondis une carte d'info pour quelqu'un qui vient d'apprendre quelque chose. Réponds en français, en 3 ou 4 phrases précises et concrètes, sans introduction, sans conclusion, sans markdown ni liste. Apporte ce que la carte ne disait pas : contexte, origine, chiffre clé, moyen mnémotechnique s'il en existe un naturel. Pour un mot étranger : étymologie, nuance d'emploi, une expression courante qui l'utilise. Tu n'as pas accès à internet : reste sur ce que tu sais avec certitude.`;
   const SYSTEM_SUGGEST = `Tu proposes des thèmes d'apprentissage pour une app de cartes à swiper. À partir du profil, propose 4 thèmes précis, variés, formulés comme une demande courte en français (ex. « Expressions idiomatiques italiennes », « Histoire des Jeux olympiques »). Au moins un thème doit combler une lacune visible, au moins un doit prolonger un point fort vers un niveau supérieur, au moins un doit ouvrir un domaine voisin inattendu. Ne reprends aucun thème déjà exploré.
 Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":"..."} où why fait au plus 80 caractères. Rien d'autre.`;
@@ -899,14 +932,22 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const eat = (line) => { const s = line.trim().replace(/^[\s,\[\]`]+|[\s,\[\]`]+$/g, ''); if (!s.startsWith('{')) return; try { onObj(JSON.parse(s)); } catch (e) {} };
     return { push(delta) { buf += delta; let i; while ((i = buf.indexOf('\n')) >= 0) { eat(buf.slice(0, i)); buf = buf.slice(i + 1); } }, flush() { if (buf.trim()) eat(buf); buf = ''; } };
   }
-  function acceptCard(t, c) {
+  function acceptCard(t, c, ctx) {
     if (!c || typeof c.title !== 'string' || typeof c.body !== 'string') return null;
     const title = c.title.trim(); if (!title) return null;
-    const known = new Set(t.seen.map(norm).concat(t.deck.map(x => norm(x.title))));
-    if (known.has(norm(title))) return null;
+    const key = keyOf(c.key);
+    if (ctx.titles.has(norm(title)) || (key && ctx.keys.has(key)) || indexHas(title, key)) return null;
+    const tk = tokens(title);
+    if (tk.length >= 2) for (const other of ctx.tokens) if (jaccard(tk, other) >= .6) return null;
+    ctx.titles.add(norm(title)); if (key) ctx.keys.add(key); ctx.tokens.push(tk);
     const tags = (Array.isArray(c.tags) ? c.tags : []).map(norm).filter(Boolean).slice(0, 3);
     for (const g of tags) if (!t.vocab.includes(g)) t.vocab.push(g);
-    return { title, body: c.body.trim().slice(0, 400), extra: typeof c.extra === 'string' ? c.extra.trim().slice(0, 240) : '', tags, kind: KINDS[c.kind] ? c.kind : 'info' };
+    const quiz = t.mode === 'quiz';
+    return { title, body: c.body.trim().slice(0, 400), extra: typeof c.extra === 'string' ? c.extra.trim().slice(0, 240) : '', tags, kind: quiz ? 'question' : (KINDS[c.kind] ? c.kind : 'info'), key, quiz };
+  }
+  function dedupContext(t) {
+    const all = [...t.seen, ...t.deck.map(x => x.title)];
+    return { titles: new Set(all.map(norm)), keys: new Set([...t.known, ...t.learning, ...t.acquired, ...t.deck].map(c => c.key).filter(Boolean)), tokens: all.map(tokens) };
   }
   async function fetchMore(n) {
     const t = cur();
@@ -914,15 +955,15 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const themeId = t.id;
     loading = true; ctl = new AbortController();
     setStatus('Claude prépare les prochaines cartes…', 'busy');
-    let got = 0;
+    let got = 0; const ctx = dedupContext(t);
     const sink = makeLineSink((raw) => {
       const th = P.themes[themeId]; if (!th) return;
-      const card = acceptCard(th, raw); if (!card) return;
+      const card = acceptCard(th, raw, ctx); if (!card) return;
       const wasVisible = th.deck.length; th.deck.push(card); got++;
       if (P.activeThemeId === themeId) { if (wasVisible === 0) renderDeck(true); else if (wasVisible < 3) addBackCard(card, wasVisible, th); else syncDeckMeta(); }
     });
     try {
-      await backend.generate(SYSTEM, buildUser(n), { onDelta: (d) => sink.push(d), signal: ctl.signal, tier: NEWS_RE.test(t.topic) ? 'default' : 'quick' });
+      await backend.generate(SYSTEM, buildUser(n + 2), { onDelta: (d) => sink.push(d), signal: ctl.signal, tier: NEWS_RE.test(t.topic) ? 'default' : 'quick' });
       sink.flush(); if (!got) throw { code: 'empty_completion' };
       touch(themeId); setStatus('');
     } catch (e) {
@@ -946,7 +987,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const card = el('article', 'card' + (i === 0 ? ' top' : ''));
     card.style.setProperty('--i', i); card.style.setProperty('--r', i === 0 ? 0 : (i % 2 ? -2.2 : 2.2)); card.style.setProperty('--h', hue(c.tags[0] || c.title));
     const top = el('div', 'cardTop');
-    const eyebrow = el('div', 'eyebrow'); eyebrow.append(KINDS[c.kind] || 'Info');
+    const eyebrow = el('div', 'eyebrow'); eyebrow.append(c.quiz ? 'Question' : (KINDS[c.kind] || 'Info'));
     if (c.review) { const r = el('span', 'rev'); r.append('Révision'); const d = el('span', 'dots'); for (let k = 0; k < ACQUIRED_AT; k++) { const dot = el('i'); if (k < (c.box || 0)) dot.classList.add('on'); d.append(dot); } r.append(d); eyebrow.append(r); }
     else if (c.sample) eyebrow.append(el('span', 'ex', 'exemple'));
     const titleRow = el('div', 'titleRow'); titleRow.append(titleEl(c.title));
@@ -961,9 +1002,16 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const bottom = el('div', 'cardBottom');
     const bl = c.body.length + (c.extra ? c.extra.length * .6 : 0);
     bottom.style.setProperty('--bs', (bl <= 120 ? 1.04 : bl <= 180 ? .98 : bl <= 240 ? .93 : .88) + 'rem');
-    const text = el('div', 'cardText'); text.append(el('p', null, c.body));
-    if (c.extra) text.append(el('p', 'extra', c.extra));
-    if (c.deep) text.append(el('div', 'deep', c.deep));
+    const text = el('div', 'cardText');
+    const fillAnswer = () => { if (c.quiz) text.append(el('p', 'answerLbl', 'Réponse')); text.append(el('p', null, c.body)); if (c.extra) text.append(el('p', 'extra', c.extra)); if (c.deep) text.append(el('div', 'deep', c.deep)); };
+    if (c.quiz && i === 0) {
+      card.dataset.locked = '1';
+      const gate = el('div', 'quizGate'); gate.append(el('span', null, 'Réponds de tête, puis vérifie.'));
+      const b = el('button', 'cta', 'Voir la réponse'); b.type = 'button'; b.addEventListener('pointerdown', ev => ev.stopPropagation());
+      b.onclick = (ev) => { ev.stopPropagation(); gate.remove(); delete card.dataset.locked; fillAnswer(); };
+      gate.append(b); text.append(gate);
+    } else if (c.quiz) { text.append(el('div', 'quizGate', '')); }
+    else fillAnswer();
     bottom.append(text);
     const foot = el('div', 'cardFoot');
     const tags = el('div', 'tags'); for (const g of c.tags) tags.append(el('span', 'tag', g)); foot.append(tags);
@@ -974,7 +1022,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
       foot.append(b);
     }
     bottom.append(foot);
-    card.append(top, bottom, el('div', 'stamp know', 'JE SAVAIS'), el('div', 'stamp dont', 'À APPRENDRE'));
+    card.append(top, bottom, el('div', 'stamp know', c.quiz ? 'J’AVAIS BON' : 'JE SAVAIS'), el('div', 'stamp dont', 'À APPRENDRE'));
     return card;
   }
   async function deepen(c, t, bottom, btn) {
@@ -1016,7 +1064,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     let sx = 0, sy = 0, dx = 0, dy = 0, active = false;
     const sK = card.querySelector('.stamp.know'), sD = card.querySelector('.stamp.dont');
     card.addEventListener('pointerdown', (ev) => {
-      if (flying) return; if (ev.button !== 0 && ev.pointerType === 'mouse') return;
+      if (flying || card.dataset.locked) return; if (ev.button !== 0 && ev.pointerType === 'mouse') return;
       active = true; dragging = true; sx = ev.clientX; sy = ev.clientY; dx = dy = 0;
       card.classList.add('dragging'); card.classList.remove('enter'); card.setPointerCapture(ev.pointerId);
     });
@@ -1051,7 +1099,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     interacted = true;
     const t = cur(); const card = t && t.deck.shift();
     if (!card) { renderDeck(); return; }
-    lastAction = { themeId: t.id, theme: clone(t), stats: clone(P.stats), tagStats: clone(P.tagStats) };
+    lastAction = { themeId: t.id, theme: clone(t), stats: clone(P.stats), tagStats: clone(P.tagStats), index: clone(P.index) };
     lastAction.theme.deck.unshift(card);
     const know = dir === 'know';
     if (card.review) {
@@ -1059,7 +1107,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
       if (entry) { const r = applyReview(t, entry, know); if (r === 'acquired') toast('Acquise ! Elle ne reviendra plus.'); else if (r === 'up') toast('Bien. Elle reviendra ' + fmtIn(entry.due) + '.'); else toast('Pas grave, elle reviendra ' + fmtIn(entry.due) + '.'); }
       t.sinceReview = 0;
     } else {
-      t.seen.push(card.title);
+      t.seen.push(card.title); indexAdd(card.title, card.key);
       for (const g of card.tags) { bump(t.tagStats, g, know); bump(P.tagStats, g, know); }
       if (know) { t.known.push({ ...stripCard(card), at: now() }); P.stats.known++; }
       else { t.learning.push({ ...stripCard(card), box: 0, fails: 0, due: now() + INTERVALS[0], addedAt: now() }); P.stats.unknown++; }
@@ -1071,16 +1119,16 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
   }
   function undo() {
     if (!lastAction || flying) return;
-    const { themeId, theme, stats, tagStats } = lastAction; lastAction = null;
+    const { themeId, theme, stats, tagStats, index } = lastAction; lastAction = null;
     if (!P.themes[themeId]) return;
     const live = P.themes[themeId];
     const fresh = live.deck.filter(c => !c.review && !theme.deck.some(d => norm(d.title) === norm(c.title)));
     theme.deck.push(...fresh);
-    P.themes[themeId] = theme; P.stats = stats; P.tagStats = tagStats;
+    P.themes[themeId] = theme; P.stats = stats; P.tagStats = tagStats; P.index = index;
     if (P.activeThemeId !== themeId) { P.activeThemeId = themeId; }
     touch(themeId); renderDeck(true); renderPanel(); renderHeader();
   }
-  const swipeTop = (dir) => { const top = deckEl.querySelector('.card.top'); if (top) fly(top, dir); };
+  const swipeTop = (dir) => { const top = deckEl.querySelector('.card.top'); if (!top) return; if (top.dataset.locked) { const b = top.querySelector('.quizGate .cta'); if (b) b.click(); return; } fly(top, dir); };
 
   // ================= panel =================
   function renderRatioBars(container, rows, mode, emptyMsg) {
@@ -1105,6 +1153,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     $('mSub').textContent = m == null ? 'swipe pour mesurer ta maîtrise' : `de maîtrise sur ${t.known.length + t.learning.length + t.acquired.length} cartes`;
     $('nKnown').textContent = t.known.length; $('nLearn').textContent = t.learning.length; $('nAcq').textContent = t.acquired.length; $('nDeck').textContent = t.deck.length;
     for (const b of $('panelLevel').querySelectorAll('button')) b.classList.toggle('on', b.dataset.level === levelOf(t));
+    for (const b of $('modeSeg').querySelectorAll('button')) b.classList.toggle('on', b.dataset.mode === (t.mode || 'learn'));
     const rows = tagRows(t.tagStats, 2);
     renderRatioBars($('strongList'), rows.filter(x => x.r >= .6).sort((a, b) => b.r - a.r || b.n - a.n).slice(0, 6), 'ok', 'Pas encore assez de cartes vues.');
     renderRatioBars($('weakList'), rows.filter(x => x.r < .6).sort((a, b) => a.r - b.r || b.n - a.n).slice(0, 6), 'warn', 'Rien à signaler pour l’instant.');
@@ -1129,7 +1178,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     $('viewSwipe').hidden = name !== 'swipe'; $('viewThemes').hidden = name !== 'themes'; $('viewReview').hidden = name !== 'review'; $('viewProfile').hidden = name !== 'profile';
     $('app').classList.toggle('oneScreen', name === 'swipe' || name === 'review');
     $('panel').classList.remove('open');
-    if (name === 'themes') renderThemes(); if (name === 'review') { buildReviewQueue(); renderReview(); } if (name === 'profile') renderProfile();
+    if (name === 'themes') { renderThemes(); renderThemesFooter(); } if (name === 'review') { buildReviewQueue(); renderReview(); } if (name === 'profile') renderProfile();
   }
   $('tabs').addEventListener('click', (ev) => { const b = ev.target.closest('.tab'); if (b) showView(b.dataset.view); });
 
@@ -1141,34 +1190,69 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     $('topicInput').value = isSampleTheme(t) ? '' : t.topic;
     renderDeck(true); renderPanel(); renderHeader();
   }
-  function startTopic(topic) {
+  function similarTheme(topic) {
+    const tk = tokens(topic); let best = null, bestScore = 0;
+    for (const t of Object.values(P.themes)) {
+      if (isSampleTheme(t) && normTopic(t.topic) !== normTopic(topic)) continue;
+      if (normTopic(t.topic) === normTopic(topic) || normTopic(t.raw || '') === normTopic(topic)) return { exact: t };
+      const ot = [...new Set([...tokens(t.topic), ...tokens(t.raw || '')])];
+      const inter = tk.filter(w => ot.includes(w)).length;
+      const score = Math.max(jaccard(tk, ot), tk.length && inter === tk.length ? .9 : 0, ot.length && inter === ot.length ? .9 : 0);
+      if (score > bestScore) { bestScore = score; best = t; }
+    }
+    return bestScore >= .5 ? { near: best } : {};
+  }
+  function resumeTheme(t) { activateTheme(t.id); showView('swipe'); if (t.deck.filter(c => !c.review).length <= 4) fetchMore(6); }
+  function startTopic(topic, force) {
     topic = topic.trim(); if (!topic) return;
     interacted = true;
-    const existing = Object.values(P.themes).find(t => normTopic(t.topic) === normTopic(topic));
-    if (existing) { activateTheme(existing.id); showView('swipe'); if (existing.deck.filter(c => !c.review).length <= 4) fetchMore(6); return; }
+    const m = similarTheme(topic);
+    if (m.exact) { resumeTheme(m.exact); return; }
+    if (m.near && !force) {
+      showView('swipe'); statusEl.className = 'status err'; statusEl.textContent = '';
+      const box = el('div', 'proposal'); box.append(el('span', null, `Un thème proche existe : « ${m.near.topic} ».`));
+      const a = el('button', null, 'Le reprendre'); a.type = 'button'; a.onclick = () => resumeTheme(m.near);
+      const b = el('button', null, 'Créer quand même'); b.type = 'button'; b.onclick = () => startTopic(topic, true);
+      box.append(a, b); statusEl.append(box); return;
+    }
     ctl?.abort(); lastAction = null;
     const t = newTheme(topic); P.themes[t.id] = t; P.activeThemeId = t.id;
     $('topicInput').value = topic;
     touch(t.id); showView('swipe'); renderDeck(); renderPanel(); renderHeader();
     if (!backend || aiDead) { setStatus('L’IA n’est pas disponible dans cette vue.', 'err'); return; }
     if (backend.kind === 'api' && !apiKey) { openSettings(); return; }
-    fetchMore(6);
+    fetchMore(6); canonicalize(t);
+  }
+  async function canonicalize(t) {
+    if (!aiReady()) return;
+    let out = null; const sink = makeLineSink((o) => { if (o && typeof o.title === 'string') out = o; });
+    try { await backend.generate(SYSTEM_CANON, `Thème tapé : « ${t.raw || t.topic} »`, { onDelta: (d) => sink.push(d), tier: 'quick' }); sink.flush(); } catch (e) { return; }
+    if (!out || !P.themes[t.id]) return;
+    const title = out.title.trim().slice(0, 40); const domain = DOMAINS.includes(out.domain) ? out.domain : 'Autre';
+    if (title && !Object.values(P.themes).some(x => x.id !== t.id && normTopic(x.topic) === normTopic(title))) t.topic = title;
+    t.domain = domain; touch(t.id);
+    if (P.activeThemeId === t.id) { $('topicInput').value = t.topic; renderPanel(); }
   }
   function deleteTheme(id) {
     if (!P.themes[id]) return;
     delete P.themes[id]; store.deleted.add(id);
     if (P.activeThemeId === id) { ensureTheme(); const t = cur(); if (!store.dirty.has(t.id)) store.dirty.add(t.id); lastAction = null; renderDeck(); renderPanel(); }
-    touch(); renderThemes(); renderHeader(); toast('Thème supprimé');
+    touch(); renderThemes(); renderThemesFooter(); renderHeader(); toast('Thème supprimé');
   }
   function renderThemes() {
     const grid = $('themeGrid'); grid.textContent = '';
-    for (const t of Object.values(P.themes).sort((a, b) => b.lastAt - a.lastAt)) {
+    const list = Object.values(P.themes).sort((a, b) => b.lastAt - a.lastAt);
+    const byDomain = new Map(); for (const t of list) { const d = t.domain || (isSampleTheme(t) ? 'Langues' : 'Autre'); if (!byDomain.has(d)) byDomain.set(d, []); byDomain.get(d).push(t); }
+    const order = [...byDomain.keys()].sort((a, b) => byDomain.get(b)[0].lastAt - byDomain.get(a)[0].lastAt);
+    for (const d of order) { if (byDomain.size > 1) grid.append(el('div', 'domainHead', d + ' · ' + byDomain.get(d).length)); for (const t of byDomain.get(d)) grid.append(themeCard(t)); }
+  }
+  function themeCard(t) {
       const card = el('div', 'tcard' + (t.id === P.activeThemeId ? ' active' : '')); card.style.setProperty('--h', hue(t.topic));
       card.append(el('div', 'tband'));
       const body = el('div', 'tbody'); body.append(el('h3', null, t.topic));
       const m = masteryOf(t), due = dueLearning(t).length;
       const meta = el('div', 'tmeta');
-      meta.innerHTML = `<span>${LEVEL_LABEL[levelOf(t)]}</span><span><b>${m == null ? '–' : Math.round(m * 100) + ' %'}</b> maîtrise</span><span><b>${t.learning.length}</b> en cours</span><span><b>${t.acquired.length}</b> acquises</span>` + (due ? `<span><b>${due}</b> à réviser</span>` : '') + `<span>${fmtAgo(t.lastAt)}</span>`;
+      meta.innerHTML = `<span>${LEVEL_LABEL[levelOf(t)]}${t.mode === 'quiz' ? ' · Question' : ''}</span><span><b>${m == null ? '–' : Math.round(m * 100) + ' %'}</b> maîtrise</span><span><b>${t.learning.length}</b> en cours</span><span><b>${t.acquired.length}</b> acquises</span>` + (due ? `<span><b>${due}</b> à réviser</span>` : '') + `<span>${fmtAgo(t.lastAt)}</span>`;
       body.append(meta);
       const weak = tagRows(t.tagStats, 2).filter(x => x.r < .6).sort((a, b) => a.r - b.r).slice(0, 4);
       if (weak.length) { const tg = el('div', 'ttags'); tg.append(el('span', 'sub', 'À travailler : ')); for (const x of weak) tg.append(el('span', 'tag', x.tag)); body.append(tg); }
@@ -1176,8 +1260,9 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
       const go = el('button', 'cta', t.id === P.activeThemeId ? 'Continuer' : 'Reprendre'); go.type = 'button'; go.onclick = () => { activateTheme(t.id); showView('swipe'); interacted = true; maybePrefetch(); };
       const del = el('button', 'ghost danger', 'Supprimer'); del.type = 'button';
       del.onclick = () => { if (del.dataset.arm) deleteTheme(t.id); else { del.dataset.arm = '1'; del.textContent = 'Confirmer ?'; setTimeout(() => { del.dataset.arm = ''; del.textContent = 'Supprimer'; }, 2500); } };
-      row.append(go, del); body.append(row); card.append(body); grid.append(card);
-    }
+      row.append(go, del); body.append(row); card.append(body); return card;
+  }
+  function renderThemesFooter() {
     const sl = $('sugList');
     if (!sl.childElementCount) sl.append(el('p', 'none', aiReady() ? 'Clique sur « Surprends-moi » pour des idées adaptées à ton profil.' : 'Les suggestions demandent l’IA.'));
     $('surpriseBtn').disabled = !aiReady();
@@ -1230,8 +1315,8 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const sv = el('button', 'save' + (isSaved(t, e) ? ' on' : '')); sv.type = 'button'; sv.innerHTML = SAVE_SVG; sv.onclick = (ev) => { ev.stopPropagation(); sv.classList.toggle('on', toggleSave(t, e)); }; tools.append(sv);
     tr.append(tools); top.append(eb, tr);
     const bottom = el('div', 'cardBottom'); bottom.append(el('div', 'where', t.topic));
-    if (revealed) { const tx = el('div', 'cardText'); tx.append(el('p', null, e.body)); if (e.extra) tx.append(el('p', 'extra', e.extra)); if (e.deep) tx.append(el('div', 'deep', e.deep)); bottom.append(tx); }
-    else bottom.append(el('p', 'reveal', 'Tu t’en souviens ? Touche la carte pour voir la réponse.'));
+    if (revealed) { const tx = el('div', 'cardText'); if (e.quiz) tx.append(el('p', 'answerLbl', 'Réponse')); tx.append(el('p', null, e.body)); if (e.extra) tx.append(el('p', 'extra', e.extra)); if (e.deep) tx.append(el('div', 'deep', e.deep)); bottom.append(tx); }
+    else bottom.append(el('p', 'reveal', e.quiz ? 'Réponds de tête, puis touche la carte pour vérifier.' : 'Tu t’en souviens ? Touche la carte pour voir la réponse.'));
     f.append(top, bottom); f.onclick = () => { revealed = true; renderReview(); }; wrap.append(f);
     const acts = el('div', 'reviewActions');
     if (!revealed) { const b = el('button', 'ghost', 'Voir la réponse'); b.type = 'button'; b.onclick = () => { revealed = true; renderReview(); }; acts.append(b); }
@@ -1257,6 +1342,11 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const saved = Object.values(P.themes).reduce((n, t) => n + t.saved.length, 0);
     const items = [[alive ? s.streak : 0, 'jours de suite', ''], [seen, 'cartes vues', ''], [rate, 'déjà sues', 'ok'], [learning, 'en apprentissage', 'warn'], [s.acquired, 'acquises', ''], [saved, 'sauvegardées', 'like']];
     for (const [v, l, cls] of items) { const d = el('div', 'stat ' + cls); d.append(el('b', null, v), el('span', null, l)); hero.append(d); }
+    const dm = $('domainMastery'); dm.textContent = ''; const agg = {};
+    for (const t of Object.values(P.themes)) { const n = t.known.length + t.learning.length + t.acquired.length; if (!n) continue; const d = t.domain || 'Autre'; const a = agg[d] || (agg[d] = { ok: 0, n: 0 }); a.ok += t.known.length + t.acquired.length; a.n += n; }
+    const dRows = Object.entries(agg).sort((a, b) => b[1].ok / b[1].n - a[1].ok / a[1].n);
+    if (!dRows.length) dm.append(el('p', 'none', 'Swipe des cartes pour mesurer ta maîtrise.'));
+    for (const [d, a] of dRows) { const r = a.ok / a.n; const row = el('div', 'wrow'); const bar = el('span', 'bar'); const fill = el('i', r >= .6 ? 'ok' : 'warn'); fill.style.width = Math.round(r * 100) + '%'; bar.append(fill); const n = el('span', 'n', Math.round(r * 100) + ' %'); n.append(el('small', null, ' · ' + a.n)); row.append(el('span', 'name', d), bar, n); dm.append(row); }
     const tm = $('themeMastery'); tm.textContent = '';
     const themes = Object.values(P.themes).filter(t => masteryOf(t) != null).sort((a, b) => masteryOf(b) - masteryOf(a));
     if (!themes.length) tm.append(el('p', 'none', 'Swipe des cartes dans un thème pour mesurer ta maîtrise.'));
@@ -1277,6 +1367,12 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     t.level = b.dataset.level;
     if (aiReady() && !isSampleTheme(t)) { ctl?.abort(); lastAction = null; t.deck = t.deck.filter(c => c.review); touch(t.id); renderDeck(); renderPanel(); interacted = true; fetchMore(6); toast('Niveau ' + LEVEL_LABEL[t.level].toLowerCase() + ' : nouvelles cartes en route'); }
     else { touch(t.id); renderPanel(); toast('Niveau ' + LEVEL_LABEL[t.level].toLowerCase()); }
+  });
+  $('modeSeg').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button'); const t = cur(); if (!b || !t || b.dataset.mode === (t.mode || 'learn')) return;
+    t.mode = b.dataset.mode;
+    if (aiReady() && !isSampleTheme(t)) { ctl?.abort(); lastAction = null; t.deck = t.deck.filter(c => c.review); touch(t.id); renderDeck(); renderPanel(); interacted = true; fetchMore(6); toast(t.mode === 'quiz' ? 'Mode question : réponds avant de vérifier' : 'Mode apprentissage'); }
+    else { touch(t.id); renderPanel(); toast(t.mode === 'quiz' ? 'Mode question' : 'Mode apprentissage'); }
   });
   $('exportBtn').onclick = async () => { const json = JSON.stringify(P); try { await navigator.clipboard.writeText(json); toast('Profil copié dans le presse-papiers'); } catch (e) { const ta = $('ioArea'); ta.hidden = false; ta.value = json; ta.select(); $('ioRow').hidden = true; toast('Sélectionne et copie le texte ci-dessous'); } };
   $('importBtn').onclick = () => { $('ioArea').hidden = false; $('ioArea').value = ''; $('ioRow').hidden = false; $('ioArea').focus(); };
