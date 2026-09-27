@@ -836,9 +836,10 @@
   const SYSTEM = `Tu alimentes une application d'apprentissage par cartes à swiper. L'utilisateur lit une carte et indique s'il le savait déjà ou non. Le but est de lui apprendre des choses qu'il ne sait pas encore, à son niveau, dans le thème demandé, et de mesurer ce qu'il maîtrise.
 
 Règles :
-1. Cible d'abord ce qu'il ne sait pas : dans les sous-thèmes où il a répondu « je ne savais pas », reviens avec des notions voisines, complémentaires ou plus fondamentales (jamais la même carte). Environ 50 % des cartes.
-2. Dans les sous-thèmes qu'il connaît déjà bien, ne répète pas les bases : monte d'un cran en finesse, ou passe à autre chose. Environ 20 % des cartes.
-3. Le reste explore des sous-thèmes du thème qu'il n'a pas encore rencontrés, pour cartographier ses connaissances.
+1. Variété d'abord : chaque lot couvre au moins 4 sous-thèmes différents, avec au plus 2 cartes par sous-thème. Ne te concentre jamais sur le sous-thème des dernières cartes : ce qu'il ne savait pas est déjà pris en charge par la révision espacée de l'app.
+2. Environ un tiers des cartes consolide les sous-thèmes faibles listés, en alternant entre eux, par des notions voisines ou plus fondamentales (jamais la même carte). Le reste explore des sous-thèmes du thème qu'il n'a pas encore rencontrés, pour cartographier ses connaissances.
+3. Dans les sous-thèmes qu'il connaît déjà bien, ne répète pas les bases : monte d'un cran en finesse, ou passe à autre chose.
+3b. Apprentissage d'une langue : un mot inconnu est normal, pas une lacune. Ignore la règle 2 et couvre des champs lexicaux variés et utiles au niveau demandé (quotidien, voyage, travail, corps, nourriture, verbes fréquents, expressions, faux amis…), au plus 2 mots par champ lexical par lot.
 4. Respecte le niveau demandé. Chaque carte est autonome, précise et vérifiable. "title" fait au plus 40 caractères : un titre court et concret, jamais de deux-points ni de sous-titre. "body" fait au plus 200 caractères, "extra" au plus 90. Pas de remplissage.
 5. Langue : le français. Si le thème est l'apprentissage d'une langue, "title" est le mot ou l'expression dans la langue cible, "body" sa traduction et une nuance utile, "extra" un exemple de phrase dans la langue cible.
 6. Si le thème touche à l'actualité : tu n'as pas accès à internet. Donne des faits datés que tu connais avec certitude et indique la période dans "extra". Ne fabrique jamais de résultat ni de chiffre.
@@ -886,7 +887,9 @@ Sur ce thème :
 - Keys déjà émises, à ne jamais réutiliser : ${keys}
 - Derniers titres vus, à ne pas reformuler : ${seen}
 
-Génère ${n} nouvelles cartes, une par ligne.`;
+Sous-thèmes des 6 dernières cartes vues, à éviter dans ce lot : ${[...t.known, ...t.learning].sort((a, b) => (b.at || b.addedAt || 0) - (a.at || a.addedAt || 0)).slice(0, 6).flatMap(c => c.tags).filter((v, i, a) => a.indexOf(v) === i).join(', ') || 'aucun'}
+
+Génère ${n} nouvelles cartes, une par ligne, en variant les sous-thèmes.`;
   }
   const SYSTEM_CANON = `On te donne le thème tapé librement par un utilisateur d'une app d'apprentissage. Réponds avec une seule ligne JSON : {"title":"...","domain":"..."}. "title" : un titre de thème propre, court (au plus 40 caractères), sans verbe d'injonction ni « apprends-moi », qui garde la spécificité du thème (ex. « Vocabulaire espagnol », « Histoire de France », « Football : tactique »). "domain" : exactement l'un de ces libellés : ${DOMAINS.join(' | ')}. Rien d'autre.`;
   const SYSTEM_DEEP = `Tu approfondis une carte d'info pour quelqu'un qui vient d'apprendre quelque chose. Réponds en français, en 3 ou 4 phrases précises et concrètes, sans introduction, sans conclusion, sans markdown ni liste. Apporte ce que la carte ne disait pas : contexte, origine, chiffre clé, moyen mnémotechnique s'il en existe un naturel. Pour un mot étranger : étymologie, nuance d'emploi, une expression courante qui l'utilise. Toute formule en LaTeX entre $…$. Tu n'as pas accès à internet : reste sur ce que tu sais avec certitude.`;
