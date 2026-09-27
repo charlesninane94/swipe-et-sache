@@ -170,8 +170,8 @@
   .card.dragging { transition: none; cursor: grabbing; }
   .card.top { cursor: grab; }
   .cardTop {
-    flex: 0 0 auto; min-height: 40%;
-    padding: 18px 22px 22px;
+    flex: 0 1 auto; min-height: 0; max-height: 58%;
+    padding: 16px 20px 18px;
     display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
     color: var(--band-ink);
     background:
@@ -184,16 +184,17 @@
   }
   .eyebrow .ex { text-transform: none; letter-spacing: 0; font-weight: 500; border: 1px solid rgba(255, 255, 255, .5); border-radius: 999px; padding: 1px 8px; }
   .titleRow { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
-  .card h2 {
-    font-size: clamp(1.6rem, 3vw + .8rem, 2.35rem); line-height: 1.02; letter-spacing: -.03em;
-    text-wrap: balance; overflow-wrap: anywhere;
+  .card h2, .flip h2 {
+    font-size: var(--ts, 2rem); line-height: 1.04; letter-spacing: -.03em;
+    text-wrap: balance; overflow-wrap: break-word; hyphens: auto;
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
   }
   .speak {
     flex: none; border: 1px solid rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .16);
     color: inherit; border-radius: 50%; width: 38px; height: 38px; display: grid; place-items: center;
   }
   .speak svg { width: 18px; height: 18px; }
-  .cardBottom { padding: 16px 22px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; overflow: auto; }
+  .cardBottom { padding: 14px 20px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1 1 auto; min-height: 0; overflow: auto; }
   .card p { margin: 0; font-size: 1.04rem; line-height: 1.5; }
   .card .extra { color: var(--muted); font-style: italic; font-size: .93rem; padding-left: 12px; border-left: 3px solid hsl(var(--h) var(--band-s) var(--band-l)); }
   .deep { font-size: .92rem; color: var(--ink); background: var(--surface-2); border-radius: 12px; padding: 10px 12px; line-height: 1.5; }
@@ -326,7 +327,7 @@
     background: var(--surface); border-radius: 24px; box-shadow: var(--shadow); overflow: hidden;
     display: flex; flex-direction: column; cursor: pointer;
   }
-  .flip .cardTop { min-height: 45%; }
+  .flip .cardTop { min-height: 34%; }
   .flip .cardBottom { justify-content: center; }
   .flip .where { font-size: .78rem; color: var(--muted); }
   .flip .reveal { color: var(--muted); font-style: italic; text-align: center; }
@@ -359,6 +360,18 @@
   }
   .toast.show { opacity: 1; }
 
+  @media (max-width: 600px) {
+    .brand small { display: none; }
+    .brand h1 { font-size: 1.15rem; }
+    .tabs .tab { padding: 6px 11px; font-size: .82rem; }
+    .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+    .chip { flex: none; }
+    .hint { display: none; }
+    .card p { font-size: .98rem; }
+    .deck { min-height: 380px; }
+    .actions { gap: 18px; }
+    .act { width: 60px; height: 60px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .card, .act, .chip, .wrow .bar i, .ring .prog { transition: none !important; animation: none !important; }
     .dot { animation: none; }
@@ -690,6 +703,15 @@
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
   const fmtAgo = (t) => { const d = now() - t; if (d < 3600000) return 'à l’instant'; if (d < DAY) return 'aujourd’hui'; if (d < 2 * DAY) return 'hier'; return 'il y a ' + Math.floor(d / DAY) + ' j'; };
   const langOf = (topic) => { for (const [re, l] of LANGS) if (re.test(topic)) return l; return null; };
+  function titleEl(title) {
+    const h = el('h2', null, title);
+    const L = title.length, longest = Math.max(...title.split(/\s+/).map(w => w.length));
+    let ts = L <= 12 ? 2.3 : L <= 22 ? 1.9 : L <= 34 ? 1.55 : L <= 48 ? 1.32 : 1.15;
+    if (longest > 12) ts = Math.min(ts, 1.5);
+    if (longest > 16) ts = Math.min(ts, 1.22);
+    h.style.setProperty('--ts', ts + 'rem');
+    return h;
+  }
 
   // ================= prompts =================
   const SYSTEM = `Tu alimentes une application de type « Tinder de l'info » : l'utilisateur swipe des cartes courtes et ses « j'aime » servent à renforcer ce genre d'info dans les cartes suivantes.
@@ -697,7 +719,7 @@
 Règles :
 1. Environ 70 % des cartes prolongent ce que l'utilisateur aime (mêmes sous-thèmes, même angle, même niveau que les cartes aimées). Les 30 % restantes explorent des sous-thèmes voisins du thème pour découvrir de nouveaux goûts. Évite les sous-thèmes évités.
 2. S'il n'y a encore aucun goût connu pour ce thème, appuie-toi sur le profil général de l'utilisateur, puis varie au maximum.
-3. Chaque carte est autonome, précise et vérifiable. "body" fait au plus 220 caractères. Pas de remplissage, pas d'introduction.
+3. Chaque carte est autonome, précise et vérifiable. "title" fait au plus 40 caractères : un titre court et concret, jamais de deux-points ni de sous-titre (« Records de chaleur en 2024 », pas « Crise climatique : records de température »). "body" fait au plus 220 caractères. Pas de remplissage, pas d'introduction.
 4. Langue : le français. Si le thème est l'apprentissage d'une langue, "title" est le mot ou l'expression dans la langue cible, "body" sa traduction et une nuance utile, "extra" un exemple de phrase dans la langue cible.
 5. Si le thème touche à l'actualité : tu n'as pas accès à internet. Donne des faits datés que tu connais avec certitude et indique la période dans "extra" (ex. « Saison 2024-2025 »). Ne fabrique jamais de résultat ni de chiffre.
 6. "kind" vaut l'une de ces valeurs : "mot", "fait", "actu", "conseil", "citation", "info".
@@ -880,7 +902,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const eyebrow = el('div', 'eyebrow'); eyebrow.append(KINDS[c.kind] || 'Info');
     if (c.sample) eyebrow.append(el('span', 'ex', 'exemple'));
     const titleRow = el('div', 'titleRow');
-    titleRow.append(el('h2', null, c.title));
+    titleRow.append(titleEl(c.title));
     const lang = langOf(t.topic);
     if (lang && c.kind === 'mot' && 'speechSynthesis' in window) {
       const sp = el('button', 'speak'); sp.type = 'button'; sp.title = 'Écouter'; sp.setAttribute('aria-label', 'Écouter la prononciation');
@@ -1200,7 +1222,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const top = el('div', 'cardTop');
     const eb = el('div', 'eyebrow'); eb.append(KINDS[c.kind] || 'Info');
     const boxes = el('span', 'boxes'); for (let i = 0; i < 4; i++) { const b = el('i'); if (i < (c.box || 0)) b.classList.add('on'); boxes.append(b); } eb.append(boxes);
-    const tr = el('div', 'titleRow'); tr.append(el('h2', null, c.title));
+    const tr = el('div', 'titleRow'); tr.append(titleEl(c.title));
     const lang = langOf(t.topic);
     if (lang && c.kind === 'mot' && 'speechSynthesis' in window) { const sp = el('button', 'speak'); sp.type = 'button'; sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; sp.onclick = (ev) => { ev.stopPropagation(); speak(c.title, lang); }; tr.append(sp); }
     top.append(eb, tr);
@@ -1329,6 +1351,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
 
   // ================= boot =================
   function start(hot) {
+    try { document.documentElement.lang = 'fr'; } catch (e) {}
     loadLocal(hot);
     renderAll();
     (async () => {
