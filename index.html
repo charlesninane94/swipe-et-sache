@@ -520,6 +520,14 @@
             <button type="button" data-level="expert">Expert</button>
           </div>
         </div>
+        <div id="liveRow" hidden>
+          <p class="sub" style="margin:0 0 6px;font-weight:600;color:var(--ink)">Actualité en direct</p>
+          <div class="seg small" id="liveSeg">
+            <button type="button" data-live="0">Connaissances du modèle</button>
+            <button type="button" data-live="1">Recherche web</button>
+          </div>
+          <p class="sub" id="liveNote"></p>
+        </div>
         <div><h3>Points forts</h3><p class="sub">Sous-thèmes que tu connaissais déjà.</p></div>
         <div class="wlist" id="strongList"></div>
         <div><h3>À travailler</h3><p class="sub">Sous-thèmes où tu apprends le plus.</p></div>
@@ -670,7 +678,7 @@
     tagStats: {}, index: { t: {}, k: {} }, activeThemeId: null, themes: {},
   });
   let P = newProfile();
-  const newTheme = (topic, deck) => ({ id: 't' + uid8(), topic, raw: topic, domain: '', mode: 'learn', level: P.settings.level, createdAt: now(), lastAt: now(), deck: deck || [], seen: [], known: [], learning: [], acquired: [], saved: [], tagStats: {}, vocab: [], sinceReview: 3 });
+  const newTheme = (topic, deck) => ({ id: 't' + uid8(), topic, raw: topic, domain: '', mode: 'learn', live: NEWS_RE.test(topic), level: P.settings.level, createdAt: now(), lastAt: now(), deck: deck || [], seen: [], known: [], learning: [], acquired: [], saved: [], tagStats: {}, vocab: [], sinceReview: 3 });
   function indexAdd(title, key) {
     const idx = P.index || (P.index = { t: {}, k: {} });
     idx.t[fold(title).slice(0, 60)] = 1; if (key) idx.k[key] = 1;
@@ -699,7 +707,7 @@
   function hydrate(s) {
     const base = newProfile();
     P = { ...base, ...s, settings: { ...base.settings, ...(s.settings || {}) }, stats: { ...base.stats, ...(s.stats || {}) }, tagStats: s.tagStats || {}, index: (s.index && s.index.t) ? s.index : { t: {}, k: {} }, themes: s.themes || {} };
-    for (const t of Object.values(P.themes)) { for (const k of ['deck', 'seen', 'known', 'learning', 'acquired', 'saved', 'vocab']) if (!Array.isArray(t[k])) t[k] = []; if (!t.tagStats) t.tagStats = {}; if (t.sinceReview == null) t.sinceReview = 3; if (!t.mode) t.mode = 'learn'; if (!t.raw) t.raw = t.topic; if (t.domain == null) t.domain = ''; }
+    for (const t of Object.values(P.themes)) { for (const k of ['deck', 'seen', 'known', 'learning', 'acquired', 'saved', 'vocab']) if (!Array.isArray(t[k])) t[k] = []; if (!t.tagStats) t.tagStats = {}; if (t.sinceReview == null) t.sinceReview = 3; if (!t.mode) t.mode = 'learn'; if (!t.raw) t.raw = t.topic; if (t.domain == null) t.domain = ''; if (t.live == null) t.live = NEWS_RE.test(t.topic); }
   }
   function loadLocal(hot) {
     try {
@@ -842,7 +850,7 @@ Règles :
 3b. Apprentissage d'une langue : un mot inconnu est normal, pas une lacune. Ignore la règle 2 et couvre des champs lexicaux variés et utiles au niveau demandé (quotidien, voyage, travail, corps, nourriture, verbes fréquents, expressions, faux amis…), au plus 2 mots par champ lexical par lot.
 4. Respecte le niveau demandé. Chaque carte est autonome, précise et vérifiable. "title" fait au plus 40 caractères : un titre court et concret, jamais de deux-points ni de sous-titre. "body" fait au plus 200 caractères, "extra" au plus 90. Pas de remplissage.
 5. Langue : le français. Si le thème est l'apprentissage d'une langue, "title" est le mot ou l'expression dans la langue cible, "body" sa traduction et une nuance utile, "extra" un exemple de phrase dans la langue cible.
-6. Si le thème touche à l'actualité : tu n'as pas accès à internet. Donne des faits datés que tu connais avec certitude et indique la période dans "extra". Ne fabrique jamais de résultat ni de chiffre.
+6. Si le thème touche à l'actualité et que tu n'as PAS d'outil de recherche web : donne des faits datés que tu connais avec certitude, indique la période dans "extra" et précise que c'est l'état de tes connaissances. Ne fabrique jamais de résultat ni de chiffre. Si tu as l'outil de recherche web, suis le bloc MODE ACTUALITÉ.
 7. "kind" vaut l'une de ces valeurs : "mot", "fait", "actu", "conseil", "citation", "info".
 8. "tags" : 2 ou 3 mots-clés courts en minuscules décrivant le sous-thème (ex. "verbe", "faux-ami", "révolution", "planètes"). Réutilise les tags existants quand ils conviennent : ils servent à mesurer les forces et faiblesses.
 9. Mathématiques, physique, chimie : écris toute formule ou expression en LaTeX entre $…$ (ex. $S = a\\,\\frac{1-q^n}{1-q}$, $E = mc^2$, $\\mathrm{H_2O}$), y compris dans "title" et "extra". Jamais de ^, de / ni de * en texte brut pour une formule. Dans le JSON, double chaque antislash (\\\\frac).
@@ -850,6 +858,7 @@ Règles :
 
 Format de sortie, strict : une carte par ligne, chaque ligne est un objet JSON complet et compact, sans tableau englobant, sans texte avant ou après, sans code fence. Écris la première ligne immédiatement.
 Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una mariposa se posó en la flor.","tags":["animaux","nom"],"kind":"mot","key":"mariposa-papillon"}`;
+  const LIVE_RULES = () => `MODE ACTUALITÉ : tu disposes de l'outil de recherche web. Nous sommes le ${new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}. Fais 2 à 4 recherches ciblées sur le thème pour trouver des faits des 7 derniers jours (résultats, annonces, décisions, événements), puis écris les cartes uniquement à partir de ce que tu as trouvé, sans mélanger avec des faits anciens. "extra" donne la date de l'événement et le média source (ex. « 25 sept. 2026 · L'Équipe »). "kind" vaut "actu". Ta réponse finale ne contient que les lignes JSON, aucune phrase avant ou après.`;
   const QUIZ_RULES = `MODE QUESTION : chaque carte est une question à laquelle l'utilisateur répond de tête avant de voir la réponse. "title" est la question (au plus 110 caractères, se termine par « ? », une seule réponse attendue, sans indice dans la question), "body" est la réponse courte et vérifiable (au plus 140 caractères, commence par la réponse elle-même), "extra" une précision utile (au plus 90). "kind" vaut "question". Pour une langue : question du type « Comment dit-on « papillon » en espagnol ? » ou « Que signifie « madrugar » ? ».`;
 
   const fmtTags = (rows) => rows.length ? rows.map(x => `${x.tag} (${x.k} su${x.k > 1 ? 's' : ''} / ${x.u} pas su${x.u > 1 ? 's' : ''})`).join(', ') : 'aucun pour l’instant';
@@ -873,7 +882,7 @@ Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una 
     const keys = [...t.known, ...t.learning, ...t.acquired].map(c => c.key).filter(Boolean).slice(-80).join(', ') || 'aucune';
     const covered = Object.entries(t.tagStats).sort((a, b) => (b[1].k + b[1].u) - (a[1].k + a[1].u)).slice(0, 20).map(([k, v]) => `${k} (${v.k + v.u})`).join(', ') || 'aucun';
     return `Thème demandé : « ${t.topic} »${t.domain ? ` (domaine : ${t.domain})` : ''}
-${t.mode === 'quiz' ? '\n' + QUIZ_RULES + '\n' : ''}
+${t.mode === 'quiz' ? '\n' + QUIZ_RULES + '\n' : ''}${liveOn(t) ? '\n' + LIVE_RULES() + '\n' : ''}
 
 ${globalProfileText(levelOf(t))}
 
@@ -904,10 +913,11 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     if (window.claude) return null;
     return {
       kind: 'api',
-      async generate(system, user, { onDelta, signal }) {
+      async generate(system, user, { onDelta, signal, web }) {
         if (!apiKey) throw { code: 'no_key' };
         const model = P.settings.model || 'claude-opus-5';
         const body = { model, max_tokens: 8000, stream: true, system, messages: [{ role: 'user', content: user }] };
+        if (web) body.tools = [{ type: model === 'claude-haiku-4-5' ? 'web_search_20250305' : 'web_search_20260209', name: 'web_search', max_uses: 4 }];
         const headers = { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' };
         if (model === 'claude-opus-5' || model === 'claude-sonnet-5') body.output_config = { effort: 'low' };
         if (model === 'claude-opus-5') { body.fallbacks = 'default'; headers['anthropic-beta'] = 'server-side-fallback-2026-07-01'; }
@@ -934,6 +944,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
   const ERR = { rate_limited: 'Trop de demandes pour le moment. Réessaie dans une minute.', session_expired: 'Ta session a expiré. Reconnecte-toi puis réessaie.', refused: 'Claude a refusé cette demande. Essaie de formuler le thème autrement.', empty_completion: 'Aucune carte reçue. Essaie un thème plus précis.', invalid_json: 'La réponse n’était pas lisible. Réessaie.', upstream_error: 'Petit souci de connexion. Réessaie.', prompt_too_large: 'Historique trop long. Efface le profil et repars.', bad_key: 'Clé API refusée. Vérifie-la dans les réglages.', bad_request: 'Requête refusée par l’API. Change de modèle dans les réglages.', no_key: 'Ajoute ta clé API Anthropic pour générer des cartes.' };
   const HIDE = new Set(['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed']);
   const aiReady = () => backend && !aiDead && !(backend.kind === 'api' && !apiKey);
+  const liveOn = (t) => !!(t && t.live && backend && backend.kind === 'api');
   const fixTex = (str) => typeof str === 'string' && str.includes('$') ? str.replace(/\$[^$]*\$/g, (m) => m.replace(/[\b\f\n\r\t\v]/g, (ch) => ({ '\b': '\\b', '\f': '\\f', '\n': '\\n', '\r': '\\r', '\t': '\\t', '\v': '\\v' })[ch])) : str;
   const hasMath = (c) => /\$[^$]+\$/.test((c.title || '') + (c.body || '') + (c.extra || '') + (c.deep || ''));
   let mjLoading = null;
@@ -985,7 +996,8 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
       if (P.activeThemeId === themeId) { if (wasVisible === 0) renderDeck(true); else if (wasVisible < 3) addBackCard(card, wasVisible, th); else syncDeckMeta(); }
     });
     try {
-      await backend.generate(SYSTEM, buildUser(n + 2), { onDelta: (d) => sink.push(d), signal: ctl.signal, tier: NEWS_RE.test(t.topic) ? 'default' : 'quick' });
+      if (liveOn(t)) setStatus('Claude cherche l’actualité sur le web…', 'busy');
+      await backend.generate(SYSTEM, buildUser(n + 2), { onDelta: (d) => sink.push(d), signal: ctl.signal, tier: NEWS_RE.test(t.topic) ? 'default' : 'quick', web: liveOn(t) });
       sink.flush(); if (!got) throw { code: 'empty_completion' };
       touch(themeId); setStatus('');
     } catch (e) {
@@ -1176,6 +1188,11 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     $('nKnown').textContent = t.known.length; $('nLearn').textContent = t.learning.length; $('nAcq').textContent = t.acquired.length; $('nDeck').textContent = t.deck.length;
     for (const b of $('panelLevel').querySelectorAll('button')) b.classList.toggle('on', b.dataset.level === levelOf(t));
     for (const b of $('modeSeg').querySelectorAll('button')) b.classList.toggle('on', b.dataset.mode === (t.mode || 'learn'));
+    const newsy = NEWS_RE.test(t.topic) || t.live;
+    $('liveRow').hidden = !(newsy && backend);
+    $('liveSeg').hidden = !(backend && backend.kind === 'api');
+    for (const b of $('liveSeg').querySelectorAll('button')) b.classList.toggle('on', (b.dataset.live === '1') === !!t.live);
+    $('liveNote').textContent = backend && backend.kind === 'api' ? (t.live ? 'Claude cherche sur le web des faits des 7 derniers jours avant d’écrire les cartes. Quelques centimes de recherche par lot.' : 'Sans recherche, les infos s’arrêtent à la date de connaissances du modèle.') : 'Dans cette version, Claude n’a pas accès à internet : les infos s’arrêtent à sa date de connaissances. Pour l’actualité en direct, utilise la version GitHub avec ta clé API.';
     const rows = tagRows(t.tagStats, 2);
     renderRatioBars($('strongList'), rows.filter(x => x.r >= .6).sort((a, b) => b.r - a.r || b.n - a.n).slice(0, 6), 'ok', 'Pas encore assez de cartes vues.');
     renderRatioBars($('weakList'), rows.filter(x => x.r < .6).sort((a, b) => a.r - b.r || b.n - a.n).slice(0, 6), 'warn', 'Rien à signaler pour l’instant.');
@@ -1396,6 +1413,12 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     t.mode = b.dataset.mode;
     if (aiReady() && !isSampleTheme(t)) { ctl?.abort(); lastAction = null; t.deck = t.deck.filter(c => c.review); touch(t.id); renderDeck(); renderPanel(); interacted = true; fetchMore(6); toast(t.mode === 'quiz' ? 'Mode question : réponds avant de vérifier' : 'Mode apprentissage'); }
     else { touch(t.id); renderPanel(); toast(t.mode === 'quiz' ? 'Mode question' : 'Mode apprentissage'); }
+  });
+  $('liveSeg').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button'); const t = cur(); if (!b || !t) return; const on = b.dataset.live === '1'; if (on === !!t.live) return;
+    t.live = on;
+    if (aiReady() && !isSampleTheme(t)) { ctl?.abort(); lastAction = null; t.deck = t.deck.filter(c => c.review); touch(t.id); renderDeck(); renderPanel(); interacted = true; fetchMore(6); toast(on ? 'Recherche web activée : cartes du jour en route' : 'Recherche web désactivée'); }
+    else { touch(t.id); renderPanel(); }
   });
   $('exportBtn').onclick = async () => { const json = JSON.stringify(P); try { await navigator.clipboard.writeText(json); toast('Profil copié dans le presse-papiers'); } catch (e) { const ta = $('ioArea'); ta.hidden = false; ta.value = json; ta.select(); $('ioRow').hidden = true; toast('Sélectionne et copie le texte ci-dessous'); } };
   $('importBtn').onclick = () => { $('ioArea').hidden = false; $('ioArea').value = ''; $('ioRow').hidden = false; $('ioArea').focus(); };

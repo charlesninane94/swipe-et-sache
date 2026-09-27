@@ -16,6 +16,10 @@ Page : https://charlesninane94.github.io/swipe-et-sache/
 - Chaque carte porte 2 ou 3 sous-thèmes. Un « j'aime » leur ajoute 2 points, un « passe » en retire 1. Le profil est renvoyé à Claude à chaque lot : 70 % de cartes dans tes goûts, 30 % d'exploration.
 - Sur GitHub Pages, le profil et la clé API restent dans le navigateur (localStorage). Dans la version claude.ai, le profil est aussi enregistré dans la base de l'artefact, privée par utilisateur.
 
+## Actualité en direct
+
+Sur GitHub Pages, un thème d'actualité (sport, politique, économie…) active la recherche web côté Anthropic : Claude cherche des faits des 7 derniers jours avant d'écrire les cartes, avec date et média dans chaque carte. Le commutateur « Actualité en direct » dans le panneau du thème permet de couper. Chaque recherche est facturée par Anthropic en plus des tokens. La version claude.ai n'a pas d'accès à internet.
+
 ## Clé API
 
 La page appelle `https://api.anthropic.com/v1/messages` directement depuis le navigateur. Il faut une clé Anthropic personnelle, à coller dans « Clé API ». Elle n'est envoyée qu'à l'API Anthropic. Modèles proposés : Opus 5, Sonnet 5, Haiku 4.5.
