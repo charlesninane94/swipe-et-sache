@@ -212,6 +212,9 @@
     padding: 4px 14px; border: 3px solid; border-radius: 10px; opacity: 0; pointer-events: none; background: var(--surface);
   }
   .modeSeg { display: flex; justify-content: center; }
+  mjx-container { color: inherit; }
+  mjx-container[display="true"] { margin: 6px 0 !important; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+  .card h2 mjx-container { font-size: .85em; }
   .quizGate { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; flex: 1; text-align: center; color: var(--muted); font-size: .9rem; padding: 6px 0; }
   .quizGate .cta { padding: 9px 20px; }
   .answerLbl { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; color: var(--ok); margin: 0; }
@@ -841,7 +844,8 @@ Règles :
 6. Si le thème touche à l'actualité : tu n'as pas accès à internet. Donne des faits datés que tu connais avec certitude et indique la période dans "extra". Ne fabrique jamais de résultat ni de chiffre.
 7. "kind" vaut l'une de ces valeurs : "mot", "fait", "actu", "conseil", "citation", "info".
 8. "tags" : 2 ou 3 mots-clés courts en minuscules décrivant le sous-thème (ex. "verbe", "faux-ami", "révolution", "planètes"). Réutilise les tags existants quand ils conviennent : ils servent à mesurer les forces et faiblesses.
-9. Ne répète jamais un fait déjà vu, même reformulé : les cartes sues ne doivent jamais revenir. Chaque carte porte une "key" : identifiant canonique du fait, 2 à 5 mots en minuscules sans accents séparés par des tirets (ex. "mariposa-papillon", "2024-annee-plus-chaude"). Deux formulations du même fait ont la même key ; n'émets jamais une key déjà listée.
+9. Mathématiques, physique, chimie : écris toute formule ou expression en LaTeX entre $…$ (ex. $S = a\\,\\frac{1-q^n}{1-q}$, $E = mc^2$, $\\mathrm{H_2O}$), y compris dans "title" et "extra". Jamais de ^, de / ni de * en texte brut pour une formule. Dans le JSON, double chaque antislash (\\\\frac).
+10. Ne répète jamais un fait déjà vu, même reformulé : les cartes sues ne doivent jamais revenir. Chaque carte porte une "key" : identifiant canonique du fait, 2 à 5 mots en minuscules sans accents séparés par des tirets (ex. "mariposa-papillon", "2024-annee-plus-chaude"). Deux formulations du même fait ont la même key ; n'émets jamais une key déjà listée.
 
 Format de sortie, strict : une carte par ligne, chaque ligne est un objet JSON complet et compact, sans tableau englobant, sans texte avant ou après, sans code fence. Écris la première ligne immédiatement.
 Exemple d'une ligne : {"title":"la mariposa","body":"Le papillon.","extra":"Una mariposa se posó en la flor.","tags":["animaux","nom"],"kind":"mot","key":"mariposa-papillon"}`;
@@ -885,7 +889,7 @@ Sur ce thème :
 Génère ${n} nouvelles cartes, une par ligne.`;
   }
   const SYSTEM_CANON = `On te donne le thème tapé librement par un utilisateur d'une app d'apprentissage. Réponds avec une seule ligne JSON : {"title":"...","domain":"..."}. "title" : un titre de thème propre, court (au plus 40 caractères), sans verbe d'injonction ni « apprends-moi », qui garde la spécificité du thème (ex. « Vocabulaire espagnol », « Histoire de France », « Football : tactique »). "domain" : exactement l'un de ces libellés : ${DOMAINS.join(' | ')}. Rien d'autre.`;
-  const SYSTEM_DEEP = `Tu approfondis une carte d'info pour quelqu'un qui vient d'apprendre quelque chose. Réponds en français, en 3 ou 4 phrases précises et concrètes, sans introduction, sans conclusion, sans markdown ni liste. Apporte ce que la carte ne disait pas : contexte, origine, chiffre clé, moyen mnémotechnique s'il en existe un naturel. Pour un mot étranger : étymologie, nuance d'emploi, une expression courante qui l'utilise. Tu n'as pas accès à internet : reste sur ce que tu sais avec certitude.`;
+  const SYSTEM_DEEP = `Tu approfondis une carte d'info pour quelqu'un qui vient d'apprendre quelque chose. Réponds en français, en 3 ou 4 phrases précises et concrètes, sans introduction, sans conclusion, sans markdown ni liste. Apporte ce que la carte ne disait pas : contexte, origine, chiffre clé, moyen mnémotechnique s'il en existe un naturel. Pour un mot étranger : étymologie, nuance d'emploi, une expression courante qui l'utilise. Toute formule en LaTeX entre $…$. Tu n'as pas accès à internet : reste sur ce que tu sais avec certitude.`;
   const SYSTEM_SUGGEST = `Tu proposes des thèmes d'apprentissage pour une app de cartes à swiper. À partir du profil, propose 4 thèmes précis, variés, formulés comme une demande courte en français (ex. « Expressions idiomatiques italiennes », « Histoire des Jeux olympiques »). Au moins un thème doit combler une lacune visible, au moins un doit prolonger un point fort vers un niveau supérieur, au moins un doit ouvrir un domaine voisin inattendu. Ne reprends aucun thème déjà exploré.
 Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":"..."} où why fait au plus 80 caractères. Rien d'autre.`;
 
@@ -927,9 +931,24 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
   const ERR = { rate_limited: 'Trop de demandes pour le moment. Réessaie dans une minute.', session_expired: 'Ta session a expiré. Reconnecte-toi puis réessaie.', refused: 'Claude a refusé cette demande. Essaie de formuler le thème autrement.', empty_completion: 'Aucune carte reçue. Essaie un thème plus précis.', invalid_json: 'La réponse n’était pas lisible. Réessaie.', upstream_error: 'Petit souci de connexion. Réessaie.', prompt_too_large: 'Historique trop long. Efface le profil et repars.', bad_key: 'Clé API refusée. Vérifie-la dans les réglages.', bad_request: 'Requête refusée par l’API. Change de modèle dans les réglages.', no_key: 'Ajoute ta clé API Anthropic pour générer des cartes.' };
   const HIDE = new Set(['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed']);
   const aiReady = () => backend && !aiDead && !(backend.kind === 'api' && !apiKey);
+  const fixTex = (str) => typeof str === 'string' && str.includes('$') ? str.replace(/\$[^$]*\$/g, (m) => m.replace(/[\b\f\n\r\t\v]/g, (ch) => ({ '\b': '\\b', '\f': '\\f', '\n': '\\n', '\r': '\\r', '\t': '\\t', '\v': '\\v' })[ch])) : str;
+  const hasMath = (c) => /\$[^$]+\$/.test((c.title || '') + (c.body || '') + (c.extra || '') + (c.deep || ''));
+  let mjLoading = null;
+  function loadMathJax() {
+    if (window.MathJax && window.MathJax.typesetPromise) return Promise.resolve();
+    if (mjLoading) return mjLoading;
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true }, svg: { fontCache: 'none' }, startup: { typeset: false }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'input', 'select'] } };
+    mjLoading = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js'; sc.async = true; sc.onload = () => (window.MathJax.startup && window.MathJax.startup.promise ? window.MathJax.startup.promise : Promise.resolve()).then(res, res); sc.onerror = rej; document.head.appendChild(sc); });
+    return mjLoading;
+  }
+  function renderMath(root) {
+    if (!root || !/\$[^$]+\$/.test(root.textContent || '')) return;
+    loadMathJax().then(() => window.MathJax.typesetPromise([root])).catch(() => {});
+  }
   function makeLineSink(onObj) {
     let buf = '';
-    const eat = (line) => { const s = line.trim().replace(/^[\s,\[\]`]+|[\s,\[\]`]+$/g, ''); if (!s.startsWith('{')) return; try { onObj(JSON.parse(s)); } catch (e) {} };
+    const parseLoose = (s) => { try { return JSON.parse(s); } catch (e) { return JSON.parse(s.replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, '\\\\')); } };
+    const eat = (line) => { const s = line.trim().replace(/^[\s,\[\]`]+|[\s,\[\]`]+$/g, ''); if (!s.startsWith('{')) return; try { const o = parseLoose(s); if (o && typeof o === 'object') for (const k of ['title', 'body', 'extra', 'answer', 'question']) if (typeof o[k] === 'string') o[k] = fixTex(o[k]); onObj(o); } catch (e) {} };
     return { push(delta) { buf += delta; let i; while ((i = buf.indexOf('\n')) >= 0) { eat(buf.slice(0, i)); buf = buf.slice(i + 1); } }, flush() { if (buf.trim()) eat(buf); buf = ''; } };
   }
   function acceptCard(t, c, ctx) {
@@ -1008,7 +1027,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
       card.dataset.locked = '1';
       const gate = el('div', 'quizGate'); gate.append(el('span', null, 'Réponds de tête, puis vérifie.'));
       const b = el('button', 'cta', 'Voir la réponse'); b.type = 'button'; b.addEventListener('pointerdown', ev => ev.stopPropagation());
-      b.onclick = (ev) => { ev.stopPropagation(); gate.remove(); delete card.dataset.locked; fillAnswer(); };
+      b.onclick = (ev) => { ev.stopPropagation(); gate.remove(); delete card.dataset.locked; fillAnswer(); renderMath(text); };
       gate.append(b); text.append(gate);
     } else if (c.quiz) { text.append(el('div', 'quizGate', '')); }
     else fillAnswer();
@@ -1032,7 +1051,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     let text = ''; const c2 = new AbortController();
     try {
       await backend.generate(SYSTEM_DEEP, `Thème : « ${t.topic} »\nCarte : ${JSON.stringify({ title: c.title, body: c.body, extra: c.extra })}`, { onDelta: (d) => { text += d; box.textContent = text; wrap.scrollTop = wrap.scrollHeight; }, signal: c2.signal, tier: 'default' });
-      c.deep = text.trim(); btn.remove();
+      c.deep = fixTex(text.trim()); box.textContent = c.deep; renderMath(box); btn.remove();
       for (const list of [t.learning, t.saved, t.known]) { const e = list.find(x => norm(x.title) === norm(c.title)); if (e) e.deep = c.deep; }
       touch(t.id);
     } catch (e) { box.textContent = text || 'Impossible d’approfondir pour le moment.'; btn.disabled = false; btn.textContent = 'Réessayer'; }
@@ -1042,14 +1061,14 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     if (dragging || flying) { pendingRender = true; return; }
     const stack = deckEl.querySelectorAll('.card');
     if (!stack.length || stack.length !== i) { renderDeck(); return; }
-    deckEl.prepend(makeCard(card, i, t)); syncDeckMeta();
+    const node = makeCard(card, i, t); deckEl.prepend(node); renderMath(node); syncDeckMeta();
   }
   function renderDeck(animate) {
     if (dragging || flying) { pendingRender = true; return; }
     pendingRender = false;
     const t = cur(); deckEl.textContent = '';
     const top = t ? t.deck.slice(0, 3) : [];
-    for (let i = top.length - 1; i >= 0; i--) { const card = makeCard(top[i], i, t); if (i === 0) { attachDrag(card); if (animate) card.classList.add('enter'); } deckEl.append(card); }
+    for (let i = top.length - 1; i >= 0; i--) { const card = makeCard(top[i], i, t); if (i === 0) { attachDrag(card); if (animate) card.classList.add('enter'); } deckEl.append(card); renderMath(card); }
     if (!top.length) {
       const e = el('div', 'empty'); const s = el('strong'); const p = el('p');
       if (loading) { s.textContent = 'Claude réfléchit…'; p.textContent = 'La première carte arrive dans quelques secondes.'; e.append(s, p); }
@@ -1160,6 +1179,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const ll = $('savedList'); ll.textContent = '';
     if (!t.saved.length) ll.append(el('p', 'none', 'Touche le marque-page d’une carte pour la garder ici.'));
     for (const c of t.saved.slice().reverse().slice(0, 40)) { const li = el('li'); li.style.setProperty('--h', hue(c.tags[0] || c.title)); li.append(el('b', null, c.title), el('span', null, c.body)); ll.append(li); }
+    renderMath(ll);
   }
   function renderHeader() {
     const s = P.stats, today = s.days[dayKey()] || { swipes: 0 }, goal = P.settings.dailyGoal || 20;
@@ -1317,7 +1337,7 @@ Format strict : une ligne par thème, objet JSON compact {"topic":"...","why":".
     const bottom = el('div', 'cardBottom'); bottom.append(el('div', 'where', t.topic));
     if (revealed) { const tx = el('div', 'cardText'); if (e.quiz) tx.append(el('p', 'answerLbl', 'Réponse')); tx.append(el('p', null, e.body)); if (e.extra) tx.append(el('p', 'extra', e.extra)); if (e.deep) tx.append(el('div', 'deep', e.deep)); bottom.append(tx); }
     else bottom.append(el('p', 'reveal', e.quiz ? 'Réponds de tête, puis touche la carte pour vérifier.' : 'Tu t’en souviens ? Touche la carte pour voir la réponse.'));
-    f.append(top, bottom); f.onclick = () => { revealed = true; renderReview(); }; wrap.append(f);
+    f.append(top, bottom); f.onclick = () => { revealed = true; renderReview(); }; wrap.append(f); renderMath(f);
     const acts = el('div', 'reviewActions');
     if (!revealed) { const b = el('button', 'ghost', 'Voir la réponse'); b.type = 'button'; b.onclick = () => { revealed = true; renderReview(); }; acts.append(b); }
     else { const ko = el('button', 'rbtn ko', 'Je ne savais pas'); ko.type = 'button'; ko.onclick = () => gradeReview(false); const ok = el('button', 'rbtn ok', 'Je savais'); ok.type = 'button'; ok.onclick = () => gradeReview(true); acts.append(ko, ok); }
